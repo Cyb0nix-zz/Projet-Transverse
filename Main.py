@@ -5,7 +5,7 @@ pygame.init()
 
 win = pygame.display.set_mode((1280,720))
 
-pygame.display.set_caption("First Game")
+pygame.display.set_caption("Game")
 
 x = 50
 y = 50
