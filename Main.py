@@ -1,5 +1,6 @@
 import pygame, sys
 from pygame.locals import *
+from Class import *
 
 clock = pygame.time.Clock()
 
@@ -21,7 +22,6 @@ windows_block = pygame.image.load('textures/building_night_light_on.png')
 TILE_SIZE = windows_block.get_width()
 
 true_scroll = [0, 0]
-
 
 def load_map(path):
     f = open(path + '.txt', 'r')
@@ -90,8 +90,9 @@ while True:
     display.blit(background, (0 - scroll[0] * 0.15, -250 - scroll[1] * 0.15))
 
     tile_rects = []
-    y = 0
 
+
+    y = 0
     for row in game_map:
         x = 0
         for tile in row:
