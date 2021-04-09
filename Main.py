@@ -6,11 +6,11 @@ clock = pygame.time.Clock()
 
 pygame.init()
 
-WINDOW_SIZE = (1280,720)
+WINDOW_SIZE = (1280, 720)
 
 screen = pygame.display.set_mode(WINDOW_SIZE)
 
-display = pygame.Surface((1280,704))
+display = pygame.Surface((1280, 704))
 
 pygame.display.set_caption("The Shadow of the past")
 
@@ -21,9 +21,10 @@ wall_block = pygame.image.load('textures/wall_building.png')
 windows_block = pygame.image.load('textures/building_night_light_on.png')
 TILE_SIZE = windows_block.get_width()
 
-player = player()
+player = Player("Cybonix", 20, 2)
 
-true_scroll = [0,0]
+true_scroll = [0, 0]
+
 
 def load_map(path):
     f = open(path + '.txt', 'r')
@@ -35,6 +36,7 @@ def load_map(path):
         game_map.append(list(row))
     return game_map
 
+
 game_map = load_map('map')
 
 player.setLocation(400, 500)
@@ -44,6 +46,8 @@ move_left = False
 
 player_y_momentum = 0
 air_timer = 0
+
+bullet_groupe = pygame.sprite.Group()
 
 while True:
 
@@ -90,10 +94,16 @@ while True:
         air_timer += 1
 
     player.update(display, scroll)
+    bullet_groupe.update(display,scroll,tile_rects)
+
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                bullet_groupe.add(player.shoot(scroll,WINDOW_SIZE))
+
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
                 move_right = True
