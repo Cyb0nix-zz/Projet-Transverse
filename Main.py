@@ -2,7 +2,6 @@ import pygame, sys
 from pygame.locals import *
 from Class import *
 
-
 WINDOW_SIZE = (1280, 720)
 TILE_SIZE = 32
 
@@ -16,7 +15,7 @@ pygame.display.set_caption("The Shadow of the past")
 
 map = Map("map", display, TILE_SIZE)
 
-player = Player("Cybonix", 20, 2)
+player = Player("Cybonix", 20, 5)
 player.setLocation(400, 500)
 
 true_scroll = [0, 0]
@@ -24,7 +23,8 @@ move_right = False
 move_left = False
 player_y_momentum = 0
 air_timer = 0
-
+ennemi_groupe = pygame.sprite.Group()
+ennemi_groupe = map.set_mobs(ennemi_groupe)
 bullet_groupe = pygame.sprite.Group()
 
 while True:
@@ -55,8 +55,9 @@ while True:
     else:
         air_timer += 1
 
-    bullet_groupe.update(display, scroll, tile_rects)
+    bullet_groupe.update(display, scroll, tile_rects, ennemi_groupe, player)
     player.update(display, scroll)
+    ennemi_groupe.update(display, scroll, tile_rects,player,bullet_groupe)
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -64,7 +65,7 @@ while True:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                bullet_groupe.add(player.shoot(scroll, WINDOW_SIZE))
+                bullet_groupe.add(player.shoot(WINDOW_SIZE))
 
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:

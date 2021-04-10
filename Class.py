@@ -19,6 +19,17 @@ class Map():
         for row in data:
             self.game_map.append(list(row))
 
+    def set_mobs(self, ennemi_groupe):
+        y = 0
+        for row in self.game_map:
+            x = 0
+            for tile in row:
+                if tile == '5':
+                    ennemi_groupe.add(Ennemi(20, 2, x * self.TILE_SIZE, y * self.TILE_SIZE))
+                x += 1
+            y += 1
+        return ennemi_groupe
+
     def update(self, scroll):
         self.screen.fill((146, 244, 255))
         self.screen.blit(self.background, (0 - scroll[0] * 0.15, -200 - scroll[1] * 0.15))
@@ -32,7 +43,7 @@ class Map():
                 if tile == '2':
                     self.screen.blit(self.windows_block,
                                      (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
-                if tile != '0':
+                if tile != '0' and tile != '5':
                     self.tile_rects.append(
                         pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE))
                 x += 1
@@ -45,11 +56,12 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, pseudo, health, attack):
         super().__init__()
-        self.player_img = pygame.image.load('Caracter/player.png')
+        self.player_img = pygame.image.load('Character/player.png')
         self.player_box = self.player_img.get_rect()
         self.pseudo = pseudo
         self.health = health
         self.attack = attack
+        self.lives = 5
         self.weapon = None
         self.armor = 5
 
@@ -95,8 +107,13 @@ class Player(pygame.sprite.Sprite):
     def update(self, display, scroll):
         display.blit(self.player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
 
-    def shoot(self, scroll, display):
-        return Bullet(self.player_box.x, self.player_box.y, display)
+        if self.health < 1:
+            self.health = 20
+            self.lives -= 1
+
+
+    def shoot(self, display):
+        return BulletRight(self.player_box.x+25, self.player_box.y, self.attack, display)
 
     def get_pseudo(self):
         return self.pseudo
@@ -113,19 +130,11 @@ class Player(pygame.sprite.Sprite):
 
         self.health -= damage
 
-    def refillarmor(self):
+    def refill_armor(self):
         self.armor = 5
 
     def get_armor_point(self):
         return self.armor
-
-    def attack_player(self, target_player):
-        damage = self.attack
-
-        if self.has_weapon():
-            damage += self.weapon.get_damage_amount()
-
-        target_player.damage(damage)
 
     def set_weapon(self, weapon):
         self.weapon = weapon
@@ -134,7 +143,67 @@ class Player(pygame.sprite.Sprite):
         return self.weapon is not None
 
 
-class Bullet(pygame.sprite.Sprite):
+class BulletRight(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, damage, display):
+        super().__init__()
+        self.display = display
+        self.damage = damage
+        self.image = pygame.Surface((5, 2))
+        self.image.fill((255, 255, 0))
+        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
+
+    def update(self, display, scroll, tiles, ennemi_groupe, player):
+
+        display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
+        self.rect.x += 25
+
+        if self.rect.x >= 1280 + scroll[0] + 200:
+            self.kill()
+
+        for tile in tiles:
+            if self.rect.colliderect(tile):
+                self.kill()
+
+        for ennemi in ennemi_groupe.sprites():
+            if self.rect.colliderect(ennemi.ennemi_box):
+                ennemi.damage(self.damage)
+                self.kill()
+        if self.rect.colliderect(player.player_box):
+            player.damage(self.damage)
+            self.kill()
+
+
+class BulletLeft(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, damage, display):
+        super().__init__()
+        self.damage = damage
+        self.display = display
+        self.image = pygame.Surface((5, 2))
+        self.image.fill((255, 255, 0))
+        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
+
+    def update(self, display, scroll, tiles, ennemi_groupe, player):
+
+        display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
+        self.rect.x -= 25
+
+        if self.rect.x <= 0 + scroll[0] - 200:
+            self.kill()
+
+        for tile in tiles:
+            if self.rect.colliderect(tile):
+                self.kill()
+
+        for ennemi in ennemi_groupe.sprites():
+            if self.rect.colliderect(ennemi.ennemi_box):
+                ennemi.damage(self.damage)
+                self.kill()
+        if self.rect.colliderect(player.player_box):
+            player.damage(self.damage)
+            self.kill()
+
+
+class Grenade(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, display):
         super().__init__()
         self.display = display
@@ -155,4 +224,76 @@ class Bullet(pygame.sprite.Sprite):
                 self.kill()
 
 
+class Ennemi(pygame.sprite.Sprite):
+    def __init__(self, health, attack, pos_x, pos_y):
+        super().__init__()
+        self.ennemi_img = pygame.image.load('Character/ennemi.png')
+        self.ennemi_box = self.ennemi_img.get_rect()
+        self.ennemi_box.x = pos_x
+        self.ennemi_box.y = pos_y
+        self.health = health
+        self.attack = attack
+        self.cpt = 0
+        self.shootCooldown = 0
+        self.direction = -1
 
+    def shoot(self, display,direction):
+
+        if direction == 'LEFT':
+            return BulletLeft(self.ennemi_box.x - 30, self.ennemi_box.y - 7, self.attack, display)
+        elif direction == 'RIGHT':
+            return BulletRight(self.ennemi_box.x + 30, self.ennemi_box.y - 7, self.attack, display)
+
+    def get_attack_value(self):
+        return self.attack
+
+    def update(self, display, scroll, tile_rects, player, bullet_groupe):
+
+        display.blit(self.ennemi_img, (self.ennemi_box.x - scroll[0], self.ennemi_box.y - scroll[1]))
+        self.tiles = tile_rects
+        if self.cpt > 240:
+            self.cpt = 0
+            self.direction *= -1
+        if self.direction == -1:
+            self.ennemi_box.x -= 1
+        if self.direction == 1:
+            self.ennemi_box.x += 1
+        self.cpt += 1
+
+        hit_list = []
+        for tile in self.tiles:
+            if self.ennemi_box.colliderect(tile):
+                hit_list.append(tile)
+
+        for tile in hit_list:
+            if self.direction == 1:
+                self.ennemi_box.right = tile.left
+            elif self.direction == -1:
+                self.ennemi_box.left = tile.right
+
+        hit_list = []
+        for tile in self.tiles:
+            if self.ennemi_box.colliderect(tile):
+                hit_list.append(tile)
+
+        for tile in hit_list:
+            self.ennemi_box.bottom = tile.top
+
+        if self.health < 1:
+            self.kill()
+
+        if self.ennemi_box.x - player.player_box.x < 400 and self.ennemi_box.x - player.player_box.x > 0:
+            if self.shootCooldown == 0:
+                bullet_groupe.add(self.shoot(display,'LEFT'))
+                self.shootCooldown = 50
+
+        if self.ennemi_box.x - player.player_box.x < 0 and self.ennemi_box.x - player.player_box.x > -400:
+            if self.shootCooldown == 0:
+                bullet_groupe.add(self.shoot(display,'RIGHT'))
+                self.shootCooldown = 50
+        if self.shootCooldown > 0:
+            self.shootCooldown -= 1
+
+    def damage(self, damage):
+
+        self.health -= damage
