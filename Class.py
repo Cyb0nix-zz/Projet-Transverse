@@ -2,6 +2,45 @@ import pygame, sys
 from pygame.locals import *
 
 
+class Map():
+    def __init__(self, path, screen, TILE_SIZE):
+        self.TILE_SIZE = TILE_SIZE
+        self.screen = screen
+        self.path = path
+        self.background = pygame.image.load('textures/Background/Map_ville.png')
+        self.wall_block = pygame.image.load('textures/wall_building.png')
+        self.windows_block = pygame.image.load('textures/building_night_light_on.png')
+
+        f = open(path + '.txt', 'r')
+        data = f.read()
+        f.close()
+        data = data.split('\n')
+        self.game_map = []
+        for row in data:
+            self.game_map.append(list(row))
+
+    def update(self, scroll):
+        self.screen.fill((146, 244, 255))
+        self.screen.blit(self.background, (0 - scroll[0] * 0.15, -200 - scroll[1] * 0.15))
+        self.tile_rects = []
+        y = 0
+        for row in self.game_map:
+            x = 0
+            for tile in row:
+                if tile == '1':
+                    self.screen.blit(self.wall_block, (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
+                if tile == '2':
+                    self.screen.blit(self.windows_block,
+                                     (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
+                if tile != '0':
+                    self.tile_rects.append(
+                        pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE))
+                x += 1
+            y += 1
+
+        return self.tile_rects
+
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pseudo, health, attack):
@@ -56,8 +95,8 @@ class Player(pygame.sprite.Sprite):
     def update(self, display, scroll):
         display.blit(self.player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
 
-    def shoot(self,scroll,display):
-        return Bullet(self.player_box.x, self.player_box.y,display)
+    def shoot(self, scroll, display):
+        return Bullet(self.player_box.x, self.player_box.y, display)
 
     def get_pseudo(self):
         return self.pseudo
@@ -99,23 +138,21 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, display):
         super().__init__()
         self.display = display
-        self.image = pygame.Surface((5,2))
-        self.image.fill((255,255,0))
-        self.rect = self.image.get_rect(center=(pos_x+40, pos_y+35))
+        self.image = pygame.Surface((5, 2))
+        self.image.fill((255, 255, 0))
+        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
-    def update(self,display,scroll,tiles):
+    def update(self, display, scroll, tiles):
 
-        display.blit(self.image, (self.rect.x-scroll[0], self.rect.y - scroll[1]))
+        display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
         self.rect.x += 25
 
-        if self.rect.x >= self.display[0]+scroll[0]+200:
+        if self.rect.x >= self.display[0] + scroll[0] + 200:
             self.kill()
 
         for tile in tiles:
             if self.rect.colliderect(tile):
                 self.kill()
-
-
 
 
 
