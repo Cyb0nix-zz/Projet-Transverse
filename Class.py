@@ -57,7 +57,7 @@ class Player(pygame.sprite.Sprite):
         display.blit(self.player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
 
     def shoot(self,scroll,display):
-        return Bullet(self.player_box.center[0]-scroll[0], self.player_box.center[1],display)
+        return Bullet(self.player_box.x, self.player_box.y,display)
 
     def get_pseudo(self):
         return self.pseudo
@@ -101,16 +101,21 @@ class Bullet(pygame.sprite.Sprite):
         self.display = display
         self.image = pygame.Surface((5,2))
         self.image.fill((255,255,0))
-        self.rect = self.image.get_rect(center=(pos_x+15, pos_y+3))
+        self.rect = self.image.get_rect(center=(pos_x+40, pos_y+35))
 
     def update(self,display,scroll,tiles):
-        self.rect.x += 5
-        display.blit(self.image, (self.rect.x, self.rect.y - scroll[1]))
 
-        if self.rect.x >= self.display[0]+200:
+        display.blit(self.image, (self.rect.x-scroll[0], self.rect.y - scroll[1]))
+        self.rect.x += 25
+
+        if self.rect.x >= self.display[0]+scroll[0]+200:
             self.kill()
+
         for tile in tiles:
             if self.rect.colliderect(tile):
                 self.kill()
+
+
+
 
 

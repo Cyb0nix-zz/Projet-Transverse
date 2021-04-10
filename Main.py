@@ -61,7 +61,8 @@ while True:
 
     display.blit(background, (0 - scroll[0] * 0.15, -200 - scroll[1] * 0.15))
 
-    tile_rects = []
+    tile_rects =[]
+    player_movement = [0, 0]
     y = 0
     for row in game_map:
         x = 0
@@ -75,7 +76,6 @@ while True:
             x += 1
         y += 1
 
-    player_movement = [0, 0]
 
     if move_right:
         player_movement[0] += 3
@@ -93,8 +93,9 @@ while True:
     else:
         air_timer += 1
 
+    bullet_groupe.update(display, scroll, tile_rects)
     player.update(display, scroll)
-    bullet_groupe.update(display,scroll,tile_rects)
+    tile_rects.clear()
 
     for event in pygame.event.get():
         if event.type == QUIT:
