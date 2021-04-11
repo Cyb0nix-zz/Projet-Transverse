@@ -143,15 +143,15 @@ while run:
     if trash_button.draw(screen):
         del_function(level)
     if save_button.draw(screen):
-        with open(f'level{level}_data.csv', 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile, delimiter=',')
+        with open(f'level{level}_data.txt', 'w', newline='') as txtfile:
+            writer = csv.writer(txtfile, delimiter=',')
             for row in world_data:
                 writer.writerow(row)
     if load_button.draw(screen):
         scroll = 0
         try:
-            with open(f'level{level}_data.csv', newline='') as csvfile:
-                reader = csv.reader(csvfile, delimiter=',')
+            with open(f'level{level}_data.txt', newline='') as txtfile:
+                reader = csv.reader(txtfile, delimiter=',')
                 for x, row in enumerate(reader):
                     for y, tile in enumerate(row):
                         world_data[x][y] = int(tile)
