@@ -1,5 +1,4 @@
-import pygame, sys
-from pygame.locals import *
+import pygame
 
 
 class Map():
@@ -54,14 +53,15 @@ class Map():
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, pseudo, health, attack):
+    def __init__(self, pseudo, health, lives, attack):
         super().__init__()
         self.player_img = pygame.image.load('Character/player.png')
+        self.heart = pygame.image.load('textures/life.gif')
         self.player_box = self.player_img.get_rect()
         self.pseudo = pseudo
         self.health = health
         self.attack = attack
-        self.lives = 5
+        self.lives = lives
         self.weapon = None
         self.armor = 5
 
@@ -107,10 +107,15 @@ class Player(pygame.sprite.Sprite):
     def update(self, display, scroll):
         display.blit(self.player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
 
+        for i in range(self.lives):
+            display.blit(self.heart, (self.heart.get_width()*i+10+i*5, 10))
+
+
         if self.health < 1:
             self.health = 20
             self.lives -= 1
 
+        print("health: ", self.health,"\n","Lives: ",self.lives)
 
     def shoot(self, display):
         return BulletRight(self.player_box.x+25, self.player_box.y, self.attack, display)
@@ -153,6 +158,7 @@ class BulletRight(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles, ennemi_groupe, player):
+
 
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
         self.rect.x += 25

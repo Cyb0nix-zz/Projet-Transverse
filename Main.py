@@ -1,12 +1,11 @@
 import pygame, sys
-from pygame.locals import *
-from Class import *
+from pygame.locals import*
+from Class import*
 
 WINDOW_SIZE = (1280, 720)
 TILE_SIZE = 32
 
 clock = pygame.time.Clock()
-
 pygame.init()
 
 screen = pygame.display.set_mode(WINDOW_SIZE)
@@ -15,7 +14,7 @@ pygame.display.set_caption("The Shadow of the past")
 
 map = Map("map", display, TILE_SIZE)
 
-player = Player("Cybonix", 20, 5)
+player = Player("Cybonix", 20, 4, 4)
 player.setLocation(400, 500)
 
 true_scroll = [0, 0]
@@ -40,9 +39,9 @@ while True:
     player_movement = [0, 0]
 
     if move_right:
-        player_movement[0] += 3
+        player_movement[0] += 4
     if move_left:
-        player_movement[0] -= 3
+        player_movement[0] -= 4
     player_movement[1] += player_y_momentum
     player_y_momentum += 0.6
     if player_y_momentum > 3:
