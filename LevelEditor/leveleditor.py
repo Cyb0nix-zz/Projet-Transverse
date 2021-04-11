@@ -39,7 +39,7 @@ bg = bg_0.convert_alpha()
 # Créer les différentes tile
 img_list = []
 for x in range(TILE_TYPES):
-    img = pygame.image.load(f'32x32/file/{x}.png').convert_alpha()
+    img = pygame.image.load(f'32x32/{x}.png').convert_alpha()
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
 
