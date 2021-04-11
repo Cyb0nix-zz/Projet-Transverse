@@ -20,7 +20,7 @@ SIDE_MARGIN = 500
 ROWS = 29
 MAX_COLS = 312
 TILE_SIZE = 32
-TILE_TYPES = 133
+TILE_TYPES = 134
 level = 0
 scroll_left = False
 scroll_right = False
@@ -193,7 +193,7 @@ while run:
                 scroll_left = True
             if event.key == pygame.K_RIGHT:
                 scroll_right = True
-            if event.key == pygame.K_LSHIFT or pygame.K_RSHIFT:
+            if event.key == pygame.K_LSHIFT:
                 scroll_speed = 5
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
