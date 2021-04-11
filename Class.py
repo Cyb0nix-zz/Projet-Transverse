@@ -108,17 +108,14 @@ class Player(pygame.sprite.Sprite):
         display.blit(self.player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
 
         for i in range(self.lives):
-            display.blit(self.heart, (self.heart.get_width()*i+10+i*5, 10))
-
+            display.blit(self.heart, (self.heart.get_width() * i + 10 + i * 5, 10))
 
         if self.health < 1:
             self.health = 20
             self.lives -= 1
 
-        print("health: ", self.health,"\n","Lives: ",self.lives)
-
     def shoot(self, display):
-        return BulletRight(self.player_box.x+25, self.player_box.y, self.attack, display)
+        return BulletRight(self.player_box.x + 25, self.player_box.y, self.attack, display)
 
     def get_pseudo(self):
         return self.pseudo
@@ -158,7 +155,6 @@ class BulletRight(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles, ennemi_groupe, player):
-
 
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
         self.rect.x += 25
@@ -242,8 +238,9 @@ class Ennemi(pygame.sprite.Sprite):
         self.cpt = 0
         self.shootCooldown = 0
         self.direction = -1
+        self.ennemi_momentum = 0
 
-    def shoot(self, display,direction):
+    def shoot(self, display, direction):
 
         if direction == 'LEFT':
             return BulletLeft(self.ennemi_box.x - 30, self.ennemi_box.y - 7, self.attack, display)
@@ -277,6 +274,11 @@ class Ennemi(pygame.sprite.Sprite):
             elif self.direction == -1:
                 self.ennemi_box.left = tile.right
 
+        self.ennemi_momentum += 0.6
+        if self.ennemi_momentum > 3:
+            self.ennemi_momentum = 3
+
+        self.ennemi_box.y += self.ennemi_momentum
         hit_list = []
         for tile in self.tiles:
             if self.ennemi_box.colliderect(tile):
@@ -284,18 +286,19 @@ class Ennemi(pygame.sprite.Sprite):
 
         for tile in hit_list:
             self.ennemi_box.bottom = tile.top
+            self.ennemi_momentum = 0
 
         if self.health < 1:
             self.kill()
 
         if self.ennemi_box.x - player.player_box.x < 400 and self.ennemi_box.x - player.player_box.x > 0:
             if self.shootCooldown == 0:
-                bullet_groupe.add(self.shoot(display,'LEFT'))
+                bullet_groupe.add(self.shoot(display, 'LEFT'))
                 self.shootCooldown = 50
 
         if self.ennemi_box.x - player.player_box.x < 0 and self.ennemi_box.x - player.player_box.x > -400:
             if self.shootCooldown == 0:
-                bullet_groupe.add(self.shoot(display,'RIGHT'))
+                bullet_groupe.add(self.shoot(display, 'RIGHT'))
                 self.shootCooldown = 50
         if self.shootCooldown > 0:
             self.shootCooldown -= 1
