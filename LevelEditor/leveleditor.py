@@ -20,7 +20,7 @@ SIDE_MARGIN = 500
 ROWS = 29
 MAX_COLS = 312
 TILE_SIZE = 32
-TILE_TYPES = 92
+TILE_TYPES = 133
 level = 0
 scroll_left = False
 scroll_right = False
@@ -34,18 +34,12 @@ pygame.display.set_caption('Level editor')
 
 # Background
 bg_0 = pygame.image.load('bg/0.png').convert_alpha()
-bg_1 = pygame.image.load('bg/1.png').convert_alpha()
-bg_2 = pygame.image.load('bg/2.png').convert_alpha()
-bg_3 = pygame.image.load('bg/3.png').convert_alpha()
-bg_4 = pygame.image.load('bg/4.png').convert_alpha()
-bg_5 = pygame.image.load('bg/5.png').convert_alpha()
-bg_6 = pygame.image.load('bg/6.png').convert_alpha()
 bg = bg_0.convert_alpha()
 
 # Créer les différentes tile
 img_list = []
 for x in range(TILE_TYPES):
-    img = pygame.image.load(f'32x32/{x}.png').convert_alpha()
+    img = pygame.image.load(f'32x32/file/{x}.png').convert_alpha()
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     img_list.append(img)
 
@@ -201,34 +195,6 @@ while run:
                 scroll_right = True
             if event.key == pygame.K_LSHIFT:
                 scroll_speed = 5
-            if event.key == pygame.K_1:
-                bg = bg_1
-                scroll = 0
-                level = 10
-            if event.key == pygame.K_2:
-                bg = bg_2
-                scroll = 0
-                level = 20
-            if event.key == pygame.K_3:
-                bg = bg_3
-                scroll = 0
-                level = 30
-            if event.key == pygame.K_4:
-                bg = bg_4
-                scroll = 0
-                level = 40
-            if event.key == pygame.K_5:
-                bg = bg_5
-                scroll = 0
-                level = 50
-            if event.key == pygame.K_6:
-                bg = bg_6
-                scroll = 0
-                level = 60
-            if event.key == pygame.K_0:
-                bg = bg_0
-                scroll = 0
-                level = 0
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 scroll_left = False
