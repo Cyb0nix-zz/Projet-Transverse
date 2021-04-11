@@ -95,7 +95,7 @@ def del_function(level):
     try:
         msgbox = messagebox.askquestion('Delete level ', 'Voulez-vous vraiment supprimer le niveau ? ', icon="warning")
         if msgbox == 'yes':
-            os.remove(f'level{level}_data.csv')
+            os.remove(f'level{level}_data.txt')
         else:
             pass
     except FileNotFoundError:
@@ -193,7 +193,7 @@ while run:
                 scroll_left = True
             if event.key == pygame.K_RIGHT:
                 scroll_right = True
-            if event.key == pygame.K_LSHIFT:
+            if event.key == pygame.K_LSHIFT or pygame.K_RSHIFT:
                 scroll_speed = 5
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
