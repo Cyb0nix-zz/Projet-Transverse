@@ -14,6 +14,12 @@ pygame.display.set_caption("The Shadow of the past")
 
 map = Map("map", display, TILE_SIZE)
 
+animation = Animations()
+
+animation_database = {}
+
+animation_database['run'] = animation.load_animation('')
+
 player = Player("Cybonix", 20, 4, 4)
 player.setLocation(400, 500)
 
