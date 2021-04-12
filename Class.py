@@ -57,7 +57,6 @@ class Animations():
         global animation_frames
         self.animation_frames = {}
 
-
     def load_animation(self, path, frame_durations):
         animation_name = path.split('/')[-1]
         animation_frame_data = []
@@ -65,18 +64,25 @@ class Animations():
         for frame in frame_durations:
             animation_frame_id = animation_name + '_' + str(n)
             img_loc = path + "/" + animation_frame_id + '.png'
-            animation_image = pygame.image.load(img_loc).convert()
+            animation_image = pygame.image.load(img_loc)
             self.animation_frames[animation_frame_id] = animation_image.copy()
             for i in range(frame):
                 animation_frame_data.append(animation_frame_id)
             n += 1
         return animation_frame_data
 
+    def change_action(self, action_var, frame, new_value):
+        if action_var != new_value:
+            action_var = new_value
+            frame = 0
+        return action_var, frame
+
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pseudo, health, lives, attack):
         super().__init__()
-        self.player_img = pygame.image.load('Character/player.png')
+        self.player_img = pygame.image.load('Character/idle/idle_0.png')
         self.heart = pygame.image.load('textures/life.gif')
         self.player_box = self.player_img.get_rect()
         self.pseudo = pseudo
@@ -125,8 +131,8 @@ class Player(pygame.sprite.Sprite):
                 self.player_box.top = tile.bottom
                 self.collision_types['top'] = True
 
-    def update(self, display, scroll):
-        display.blit(self.player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
+    def update(self, player_img, display, scroll):
+        display.blit(player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
 
         for i in range(self.lives):
             display.blit(self.heart, (self.heart.get_width() * i + 10 + i * 5, 10))
@@ -135,9 +141,12 @@ class Player(pygame.sprite.Sprite):
             self.health = 20
             self.lives -= 1
 
+    def shoot(self, display, direction):
 
-    def shoot(self, display):
-        return BulletRight(self.player_box.x + 25, self.player_box.y, self.attack, display)
+        if direction:
+            return BulletLeft(self.player_box.x - 25, self.player_box.y, self.attack, display)
+        else:
+            return BulletRight(self.player_box.x + 25, self.player_box.y, self.attack, display)
 
     def get_pseudo(self):
         return self.pseudo
@@ -264,9 +273,9 @@ class Ennemi(pygame.sprite.Sprite):
 
     def shoot(self, display, direction):
 
-        if direction == 'LEFT':
+        if direction:
             return BulletLeft(self.ennemi_box.x - 30, self.ennemi_box.y - 7, self.attack, display)
-        elif direction == 'RIGHT':
+        else:
             return BulletRight(self.ennemi_box.x + 30, self.ennemi_box.y - 7, self.attack, display)
 
     def get_attack_value(self):
@@ -315,12 +324,12 @@ class Ennemi(pygame.sprite.Sprite):
 
         if self.ennemi_box.x - player.player_box.x < 400 and self.ennemi_box.x - player.player_box.x > 0:
             if self.shootCooldown == 0:
-                bullet_groupe.add(self.shoot(display, 'LEFT'))
+                bullet_groupe.add(self.shoot(display, True))
                 self.shootCooldown = 50
 
         if self.ennemi_box.x - player.player_box.x < 0 and self.ennemi_box.x - player.player_box.x > -400:
             if self.shootCooldown == 0:
-                bullet_groupe.add(self.shoot(display, 'RIGHT'))
+                bullet_groupe.add(self.shoot(display, False))
                 self.shootCooldown = 50
         if self.shootCooldown > 0:
             self.shootCooldown -= 1

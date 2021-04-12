@@ -1,6 +1,6 @@
 import pygame, sys
-from pygame.locals import*
-from Class import*
+from pygame.locals import *
+from Class import *
 
 WINDOW_SIZE = (1280, 720)
 TILE_SIZE = 32
@@ -18,7 +18,16 @@ animation = Animations()
 
 animation_database = {}
 
-animation_database['run'] = animation.load_animation('')
+animation_database['walk'] = animation.load_animation('Character/walk', [5, 5, 5, 5, 5, 5])
+animation_database['idle'] = animation.load_animation('Character/idle', [7, 7])
+animation_database['jump'] = animation.load_animation('Character/jump', [7, 7, 7, 7])
+animation_database['jumpold'] = animation.load_animation('Character/jumpold', [7, 7, 7, 7, 7])
+
+player_action = 'idle'
+player_frame = 0
+player_flip = False
+
+print(animation_database)
 
 player = Player("Cybonix", 20, 4, 4)
 player.setLocation(400, 500)
@@ -53,6 +62,23 @@ while True:
     if player_y_momentum > 3:
         player_y_momentum = 3
 
+    if player_movement[0] > 0 and player_movement[1] == 0:
+        player_action, player_frame = animation.change_action(player_action, player_frame, 'walk')
+        player_flip = False
+
+    if player_movement[0] == 0:
+        player_action, player_frame = animation.change_action(player_action, player_frame, 'idle')
+
+    if player_movement[0] < 0 and player_movement[1] == 0:
+        player_action, player_frame = animation.change_action(player_action, player_frame, 'walk')
+        player_flip = True
+
+    if player_movement[1] < 0 and player_movement[0] == 0:
+        player_action, player_frame = animation.change_action(player_action, player_frame, 'jumpold')
+
+    if player_movement[1] < 0 and player_movement[0] != 0:
+        player_action, player_frame = animation.change_action(player_action, player_frame, 'jump')
+
     player.move(player_movement, tile_rects)
     if player.collision_types['bottom']:
         player_y_momentum = 0
@@ -60,9 +86,16 @@ while True:
     else:
         air_timer += 1
 
+    player_frame += 1
+    if player_frame >= len(animation_database[player_action]):
+        player_frame = 0
+
+    player_image_id = animation_database[player_action][player_frame]
+    player_img = animation.animation_frames[player_image_id]
+
     bullet_groupe.update(display, scroll, tile_rects, ennemi_groupe, player)
-    player.update(display, scroll)
-    ennemi_groupe.update(display, scroll, tile_rects,player,bullet_groupe)
+    player.update(pygame.transform.flip(player_img, player_flip, False), display, scroll)
+    ennemi_groupe.update(display, scroll, tile_rects, player, bullet_groupe)
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -70,7 +103,7 @@ while True:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                bullet_groupe.add(player.shoot(WINDOW_SIZE))
+                bullet_groupe.add(player.shoot(WINDOW_SIZE, player_flip))
 
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
