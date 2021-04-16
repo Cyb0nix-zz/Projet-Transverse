@@ -183,7 +183,7 @@ class BulletRight(pygame.sprite.Sprite):
         self.damage = damage
         self.image = pygame.Surface((5, 2))
         self.image.fill((255, 255, 0))
-        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
+        self.rect = self.image.get_rect(center=(pos_x + 15, pos_y + 24))
 
     def update(self, display, scroll, tiles, ennemi_groupe, player):
 
@@ -213,7 +213,7 @@ class BulletLeft(pygame.sprite.Sprite):
         self.display = display
         self.image = pygame.Surface((5, 2))
         self.image.fill((255, 255, 0))
-        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
+        self.rect = self.image.get_rect(center=(pos_x + 15, pos_y + 24))
 
     def update(self, display, scroll, tiles, ennemi_groupe, player):
 
