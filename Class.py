@@ -102,7 +102,10 @@ class Player(pygame.sprite.Sprite):
         self.collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
         self.tiles = tile_rects
 
-        self.player_box.x += self.movement[0]
+        if self.player_box.x > 399:
+            self.player_box.x += self.movement[0]
+        else:
+            self.player_box.x += 1
 
         hit_list = []
         for tile in self.tiles:
