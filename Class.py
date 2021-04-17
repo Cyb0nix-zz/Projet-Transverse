@@ -1,5 +1,6 @@
 import pygame
-
+from math import *
+from pygame import *
 
 class Map():
     def __init__(self, path, screen, TILE_SIZE):
@@ -148,6 +149,13 @@ class Player(pygame.sprite.Sprite):
         else:
             return BulletRight(self.player_box.x + 25, self.player_box.y, self.attack, display)
 
+    def grenade(self, display,direction):
+        if direction:
+            return GrenadeLeft(self.player_box.x,self.player_box.y,display,55)
+        else:
+            return GrenadeRight(self.player_box.x,self.player_box.y,display,55)
+
+
     def get_pseudo(self):
         return self.pseudo
 
@@ -236,21 +244,51 @@ class BulletLeft(pygame.sprite.Sprite):
             self.kill()
 
 
-class Grenade(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, display):
+class GrenadeRight(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, display, v0):
         super().__init__()
         self.display = display
-        self.image = pygame.Surface((5, 2))
-        self.image.fill((255, 255, 0))
+        self.v0 = v0
+        self.circle = []
+        self.alpha = 45
+        self.cpt = 1
+        self.image = pygame.Surface((15, 20))
+        self.image.fill((255, 0, 0))
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles):
+        print(self.rect.x,self.rect.y)
+        display.blit(self.image, (self.rect.x-scroll[0], self.rect.y-scroll[1]))
+        x = (self.v0*cos(self.alpha))*self.cpt
+        self.rect.x += x/11
+        self.rect.y -= (((-9.8 * (x**2)) / (2 * (self.v0**2) * (cos(self.alpha)**2))) + (tan(self.alpha) * x))/11
 
-        display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
-        self.rect.x += 25
+        self.cpt += 0.5
 
-        if self.rect.x >= self.display[0] + scroll[0] + 200:
-            self.kill()
+        for tile in tiles:
+            if self.rect.colliderect(tile):
+                self.kill()
+
+class GrenadeLeft(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, display, v0):
+        super().__init__()
+        self.display = display
+        self.v0 = v0
+        self.circle = []
+        self.alpha = 45
+        self.cpt = 1
+        self.image = pygame.Surface((15, 20))
+        self.image.fill((255, 0, 0))
+        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
+
+    def update(self, display, scroll, tiles):
+        print(self.rect.x,self.rect.y)
+        display.blit(self.image, (self.rect.x-scroll[0], self.rect.y-scroll[1]))
+        x = (self.v0*cos(self.alpha))*self.cpt
+        self.rect.x -= x/11
+        self.rect.y -= (((-9.8 * (x**2)) / (2 * (self.v0**2) * (cos(self.alpha)**2))) + (tan(self.alpha) * x))/11
+
+        self.cpt += 0.5
 
         for tile in tiles:
             if self.rect.colliderect(tile):

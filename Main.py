@@ -27,8 +27,6 @@ player_action = 'idle'
 player_frame = 0
 player_flip = False
 
-print(animation_database)
-
 player = Player("Cybonix", 20, 4, 4)
 player.setLocation(400, 500)
 
@@ -40,6 +38,7 @@ air_timer = 0
 ennemi_groupe = pygame.sprite.Group()
 ennemi_groupe = map.set_mobs(ennemi_groupe)
 bullet_groupe = pygame.sprite.Group()
+grenade_groupe = pygame.sprite.Group()
 
 while True:
 
@@ -76,8 +75,9 @@ while True:
     if player_movement[1] < 0 and player_movement[0] == 0:
         player_action, player_frame = animation.change_action(player_action, player_frame, 'jumpold')
 
-    if player_movement[1] < 0 and player_movement[0] != 0:
+    if player_movement[1] < 0 and player_movement[0] > 0:
         player_action, player_frame = animation.change_action(player_action, player_frame, 'jump')
+
 
     player.move(player_movement, tile_rects)
     if player.collision_types['bottom']:
@@ -96,6 +96,7 @@ while True:
     bullet_groupe.update(display, scroll, tile_rects, ennemi_groupe, player)
     player.update(pygame.transform.flip(player_img, player_flip, False), display, scroll)
     ennemi_groupe.update(display, scroll, tile_rects, player, bullet_groupe)
+    grenade_groupe.update(display,scroll,tile_rects)
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -104,7 +105,8 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 bullet_groupe.add(player.shoot(WINDOW_SIZE, player_flip))
-
+            if event.button == 3:
+                grenade_groupe.add(player.grenade(WINDOW_SIZE,player_flip))
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
                 move_right = True
