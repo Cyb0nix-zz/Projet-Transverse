@@ -1,5 +1,4 @@
-import pygame, sys
-from pygame.locals import *
+import sys
 from Class import *
 
 WINDOW_SIZE = (1280, 720)
@@ -80,7 +79,6 @@ while True:
     if player_movement[1] < 0 and player_movement[0] > 0:
         player_action, player_frame = animation.change_action(player_action, player_frame, 'jump')
 
-
     player.move(player_movement, tile_rects)
     if player.collision_types['bottom']:
         player_y_momentum = 0
@@ -98,12 +96,12 @@ while True:
     bullet_groupe.update(display, scroll, tile_rects, ennemi_groupe, player)
     player.update(pygame.transform.flip(player_img, player_flip, False), display, scroll)
     ennemi_groupe.update(display, scroll, tile_rects, player, bullet_groupe)
-    grenade_groupe.update(display,scroll,tile_rects)
+    grenade_groupe.update(display, scroll, tile_rects,ennemi_groupe)
 
     if launch_grenade:
         if v0_grenade < 60:
             v0_grenade += 0.8
-          
+
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -116,7 +114,7 @@ while True:
 
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 3:
-                grenade_groupe.add(player.grenade(WINDOW_SIZE, player_flip,v0_grenade))
+                grenade_groupe.add(player.grenade(WINDOW_SIZE, player_flip, v0_grenade))
                 launch_grenade = False
                 v0_grenade = 30
 

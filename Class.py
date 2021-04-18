@@ -85,7 +85,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pseudo, health, lives, attack):
         super().__init__()
         self.player_img = pygame.image.load('Character/idle/idle_0.png')
-        self.heart = pygame.image.load('textures/life.gif')
+        self.heart = pygame.image.load('assets/life.gif')
         self.player_box = self.player_img.get_rect()
         self.pseudo = pseudo
         self.health = health
@@ -255,11 +255,10 @@ class GrenadeRight(pygame.sprite.Sprite):
         self.circle = []
         self.alpha = 45
         self.cpt = 1
-        self.image = pygame.Surface((15, 20))
-        self.image.fill((255, 0, 0))
+        self.image = pygame.image.load('assets/grenade/grenade_1.png')
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
-    def update(self, display, scroll, tiles):
+    def update(self, display, scroll, tiles,ennemis):
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
         x = (self.v0 * cos(self.alpha)) * self.cpt
         self.rect.x += x / 11
@@ -270,6 +269,9 @@ class GrenadeRight(pygame.sprite.Sprite):
 
         for tile in tiles:
             if self.rect.colliderect(tile):
+                for ennemi in ennemis:
+                    if abs(self.rect.x - ennemi.ennemi_box.x) < 100:
+                        ennemi.damage(10)
                 self.kill()
 
 
@@ -285,7 +287,7 @@ class GrenadeLeft(pygame.sprite.Sprite):
         self.image.fill((255, 0, 0))
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
-    def update(self, display, scroll, tiles):
+    def update(self, display, scroll, tiles,ennemis):
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
         x = (self.v0 * cos(self.alpha)) * self.cpt
         self.rect.x -= x / 11
@@ -296,6 +298,9 @@ class GrenadeLeft(pygame.sprite.Sprite):
 
         for tile in tiles:
             if self.rect.colliderect(tile):
+                for ennemi in ennemis:
+                    if abs(self.rect.x - ennemi.ennemi_box.x) < 100:
+                        ennemi.damage(10)
                 self.kill()
 
 
@@ -324,7 +329,7 @@ class Ennemi(pygame.sprite.Sprite):
         return self.attack
 
     def update(self, display, scroll, tile_rects, player, bullet_groupe):
-
+        print(self.health)
         display.blit(self.ennemi_img, (self.ennemi_box.x - scroll[0], self.ennemi_box.y - scroll[1]))
         self.tiles = tile_rects
         if self.cpt > 240:
