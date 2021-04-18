@@ -26,7 +26,7 @@ player_action = 'idle'
 player_frame = 0
 player_flip = False
 
-player = Player("Cybonix", 20, 4, 4)
+player = Player("Cybonix", 20, 4, 4, 3)
 player.setLocation(400, 540)
 
 true_scroll = [0, 0]
@@ -110,13 +110,15 @@ while True:
             if event.button == 1:
                 bullet_groupe.add(player.shoot(WINDOW_SIZE, player_flip))
             if event.button == 3:
-                launch_grenade = True
+                if player.nbr_grenade > 0:
+                    launch_grenade = True
 
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 3:
-                grenade_groupe.add(player.grenade(WINDOW_SIZE, player_flip, v0_grenade))
-                launch_grenade = False
-                v0_grenade = 30
+                if player.nbr_grenade > 0:
+                    grenade_groupe.add(player.grenade(WINDOW_SIZE, player_flip, v0_grenade))
+                    launch_grenade = False
+                    v0_grenade = 30
 
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:

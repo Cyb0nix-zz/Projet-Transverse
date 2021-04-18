@@ -82,15 +82,17 @@ class Animations():
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, pseudo, health, lives, attack):
+    def __init__(self, pseudo, health, lives, attack, nbr_grenade):
         super().__init__()
         self.player_img = pygame.image.load('Character/idle/idle_0.png')
         self.heart = pygame.image.load('assets/life.gif')
+        self.grenade_img = pygame.image.load('assets/grenade/grenade_1.png')
         self.player_box = self.player_img.get_rect()
         self.pseudo = pseudo
         self.health = health
         self.attack = attack
         self.lives = lives
+        self.nbr_grenade = nbr_grenade
         self.weapon = None
         self.armor = 5
 
@@ -142,6 +144,9 @@ class Player(pygame.sprite.Sprite):
         for i in range(self.lives):
             display.blit(self.heart, (self.heart.get_width() * i + 10 + i * 5, 10))
 
+        for i in range(self.nbr_grenade):
+            display.blit(pygame.transform.scale(self.grenade_img,(16,20)),(self.heart.get_width() * i + 14 + i * 5, 40))
+
         if self.health < 1:
             self.health = 20
             self.lives -= 1
@@ -155,8 +160,10 @@ class Player(pygame.sprite.Sprite):
 
     def grenade(self, display, direction, v0):
         if direction:
+            self.nbr_grenade -= 1
             return GrenadeLeft(self.player_box.x, self.player_box.y, display, v0)
         else:
+            self.nbr_grenade -= 1
             return GrenadeRight(self.player_box.x, self.player_box.y, display, v0)
 
     def get_pseudo(self):
@@ -283,8 +290,7 @@ class GrenadeLeft(pygame.sprite.Sprite):
         self.circle = []
         self.alpha = 45
         self.cpt = 1
-        self.image = pygame.Surface((15, 20))
-        self.image.fill((255, 0, 0))
+        self.image = pygame.image.load('assets/grenade/grenade_1.png')
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles,ennemis):
@@ -364,6 +370,8 @@ class Ennemi(pygame.sprite.Sprite):
         for tile in hit_list:
             self.ennemi_box.bottom = tile.top
             self.ennemi_momentum = 0
+
+
 
         if self.health < 1:
             self.kill()
