@@ -2,6 +2,7 @@ import pygame
 from math import *
 from pygame import *
 
+
 class Map():
     def __init__(self, path, screen, TILE_SIZE):
         self.TILE_SIZE = TILE_SIZE
@@ -152,12 +153,11 @@ class Player(pygame.sprite.Sprite):
         else:
             return BulletRight(self.player_box.x + 25, self.player_box.y, self.attack, display)
 
-    def grenade(self, display,direction):
+    def grenade(self, display, direction, v0):
         if direction:
-            return GrenadeLeft(self.player_box.x,self.player_box.y,display,55)
+            return GrenadeLeft(self.player_box.x, self.player_box.y, display, v0)
         else:
-            return GrenadeRight(self.player_box.x,self.player_box.y,display,55)
-
+            return GrenadeRight(self.player_box.x, self.player_box.y, display, v0)
 
     def get_pseudo(self):
         return self.pseudo
@@ -260,17 +260,18 @@ class GrenadeRight(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles):
-        print(self.rect.x,self.rect.y)
-        display.blit(self.image, (self.rect.x-scroll[0], self.rect.y-scroll[1]))
-        x = (self.v0*cos(self.alpha))*self.cpt
-        self.rect.x += x/11
-        self.rect.y -= (((-9.8 * (x**2)) / (2 * (self.v0**2) * (cos(self.alpha)**2))) + (tan(self.alpha) * x))/11
+        display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
+        x = (self.v0 * cos(self.alpha)) * self.cpt
+        self.rect.x += x / 11
+        self.rect.y -= (((-9.8 * (x ** 2)) / (2 * (self.v0 ** 2) * (cos(self.alpha) ** 2))) + (
+                    tan(self.alpha) * x)) / 11
 
         self.cpt += 0.5
 
         for tile in tiles:
             if self.rect.colliderect(tile):
                 self.kill()
+
 
 class GrenadeLeft(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, display, v0):
@@ -285,11 +286,11 @@ class GrenadeLeft(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles):
-        print(self.rect.x,self.rect.y)
-        display.blit(self.image, (self.rect.x-scroll[0], self.rect.y-scroll[1]))
-        x = (self.v0*cos(self.alpha))*self.cpt
-        self.rect.x -= x/11
-        self.rect.y -= (((-9.8 * (x**2)) / (2 * (self.v0**2) * (cos(self.alpha)**2))) + (tan(self.alpha) * x))/11
+        display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
+        x = (self.v0 * cos(self.alpha)) * self.cpt
+        self.rect.x -= x / 11
+        self.rect.y -= (((-9.8 * (x ** 2)) / (2 * (self.v0 ** 2) * (cos(self.alpha) ** 2))) + (
+                    tan(self.alpha) * x)) / 11
 
         self.cpt += 0.5
 

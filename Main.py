@@ -34,6 +34,8 @@ true_scroll = [0, 0]
 move_right = False
 move_left = False
 player_y_momentum = 0
+v0_grenade = 30
+launch_grenade = False
 air_timer = 0
 ennemi_groupe = pygame.sprite.Group()
 ennemi_groupe = map.set_mobs(ennemi_groupe)
@@ -98,6 +100,10 @@ while True:
     ennemi_groupe.update(display, scroll, tile_rects, player, bullet_groupe)
     grenade_groupe.update(display,scroll,tile_rects)
 
+    if launch_grenade:
+        if v0_grenade < 60:
+            v0_grenade += 0.8
+          
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -106,7 +112,14 @@ while True:
             if event.button == 1:
                 bullet_groupe.add(player.shoot(WINDOW_SIZE, player_flip))
             if event.button == 3:
-                grenade_groupe.add(player.grenade(WINDOW_SIZE,player_flip))
+                launch_grenade = True
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 3:
+                grenade_groupe.add(player.grenade(WINDOW_SIZE, player_flip,v0_grenade))
+                launch_grenade = False
+                v0_grenade = 30
+
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
                 move_right = True
