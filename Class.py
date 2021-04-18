@@ -329,7 +329,6 @@ class Ennemi(pygame.sprite.Sprite):
         return self.attack
 
     def update(self, display, scroll, tile_rects, player, bullet_groupe):
-        print(self.health)
         display.blit(self.ennemi_img, (self.ennemi_box.x - scroll[0], self.ennemi_box.y - scroll[1]))
         self.tiles = tile_rects
         if self.cpt > 240:
