@@ -20,7 +20,7 @@ SIDE_MARGIN = 500
 ROWS = 29
 MAX_COLS = 312
 TILE_SIZE = 32
-TILE_TYPES = 92
+TILE_TYPES = 134
 level = 0
 scroll_left = False
 scroll_right = False
@@ -34,12 +34,6 @@ pygame.display.set_caption('Level editor')
 
 # Background
 bg_0 = pygame.image.load('bg/0.png').convert_alpha()
-bg_1 = pygame.image.load('bg/1.png').convert_alpha()
-bg_2 = pygame.image.load('bg/2.png').convert_alpha()
-bg_3 = pygame.image.load('bg/3.png').convert_alpha()
-bg_4 = pygame.image.load('bg/4.png').convert_alpha()
-bg_5 = pygame.image.load('bg/5.png').convert_alpha()
-bg_6 = pygame.image.load('bg/6.png').convert_alpha()
 bg = bg_0.convert_alpha()
 
 # Créer les différentes tile
@@ -101,7 +95,7 @@ def del_function(level):
     try:
         msgbox = messagebox.askquestion('Delete level ', 'Voulez-vous vraiment supprimer le niveau ? ', icon="warning")
         if msgbox == 'yes':
-            os.remove(f'level{level}_data.csv')
+            os.remove(f'level{level}_data.txt')
         else:
             pass
     except FileNotFoundError:
@@ -149,15 +143,15 @@ while run:
     if trash_button.draw(screen):
         del_function(level)
     if save_button.draw(screen):
-        with open(f'level{level}_data.csv', 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile, delimiter=',')
+        with open(f'level{level}_data.txt', 'w', newline='') as txtfile:
+            writer = csv.writer(txtfile, delimiter=',')
             for row in world_data:
                 writer.writerow(row)
     if load_button.draw(screen):
         scroll = 0
         try:
-            with open(f'level{level}_data.csv', newline='') as csvfile:
-                reader = csv.reader(csvfile, delimiter=',')
+            with open(f'level{level}_data.txt', newline='') as txtfile:
+                reader = csv.reader(txtfile, delimiter=',')
                 for x, row in enumerate(reader):
                     for y, tile in enumerate(row):
                         world_data[x][y] = int(tile)
@@ -201,34 +195,6 @@ while run:
                 scroll_right = True
             if event.key == pygame.K_LSHIFT:
                 scroll_speed = 5
-            if event.key == pygame.K_1:
-                bg = bg_1
-                scroll = 0
-                level = 10
-            if event.key == pygame.K_2:
-                bg = bg_2
-                scroll = 0
-                level = 20
-            if event.key == pygame.K_3:
-                bg = bg_3
-                scroll = 0
-                level = 30
-            if event.key == pygame.K_4:
-                bg = bg_4
-                scroll = 0
-                level = 40
-            if event.key == pygame.K_5:
-                bg = bg_5
-                scroll = 0
-                level = 50
-            if event.key == pygame.K_6:
-                bg = bg_6
-                scroll = 0
-                level = 60
-            if event.key == pygame.K_0:
-                bg = bg_0
-                scroll = 0
-                level = 0
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 scroll_left = False
