@@ -86,7 +86,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.player_img = pygame.image.load('Character/idle/idle_0.png')
         self.heart = pygame.image.load('assets/life.gif')
-        self.grenade_img = pygame.image.load('assets/grenade/grenade_1.png')
+        self.grenade_img = pygame.image.load('assets/grenade/grenade_0.png')
         self.player_box = self.player_img.get_rect()
         self.pseudo = pseudo
         self.health = health
@@ -268,26 +268,43 @@ class GrenadeRight(pygame.sprite.Sprite):
         self.display = display
         self.v0 = v0
         self.circle = []
+        self.animation = Animations()
+        self.animation_list = self.animation.load_animation('assets/grenade', [5, 5, 5])
+        self.image_id = 0
         self.alpha = 45
+        self.hit = False
+        self.animation_frame = 0
         self.cpt = 1
-        self.image = pygame.image.load('assets/grenade/grenade_1.png')
+        self.image = pygame.image.load('assets/grenade/grenade_0.png')
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles, ennemis):
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
-        x = (self.v0 * cos(self.alpha)) * self.cpt
-        self.rect.x += x / 11
-        self.rect.y -= (((-9.8 * (x ** 2)) / (2 * (self.v0 ** 2) * (cos(self.alpha) ** 2))) + (
-                tan(self.alpha) * x)) / 11
 
-        self.cpt += 0.5
+        if not self.hit:
+            x = (self.v0 * cos(self.alpha)) * self.cpt
+            self.rect.x += x / 11
+            self.rect.y -= (((-9.8 * (x ** 2)) / (2 * (self.v0 ** 2) * (cos(self.alpha) ** 2))) + (
+                    tan(self.alpha) * x)) / 11
+
+            self.cpt += 0.5
 
         for tile in tiles:
             if self.rect.colliderect(tile):
+                self.rect.bottom = tile.top
+                self.hit = True
+
+        if self.hit:
+            self.animation_frame += 1
+            if self.animation_frame < len(self.animation_list):
+                self.image_id = self.animation_list[self.animation_frame]
+                self.image = self.animation.animation_frames[self.image_id]
+            else:
                 for ennemi in ennemis:
                     if abs(self.rect.x - ennemi.ennemi_box.x) < 100:
                         ennemi.damage(10)
                 self.kill()
+
 
 
 class GrenadeLeft(pygame.sprite.Sprite):
@@ -298,7 +315,7 @@ class GrenadeLeft(pygame.sprite.Sprite):
         self.circle = []
         self.alpha = 45
         self.cpt = 1
-        self.image = pygame.image.load('assets/grenade/grenade_1.png')
+        self.image = pygame.image.load('assets/grenade/grenade_0.png')
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles, ennemis):
