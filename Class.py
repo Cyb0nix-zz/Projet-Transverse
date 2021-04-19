@@ -146,8 +146,8 @@ class Player(pygame.sprite.Sprite):
             display.blit(self.heart, (self.heart.get_width() * i + 10 + i * 5, 10))
 
         for i in range(self.nbr_grenade):
-            display.blit(pygame.transform.scale(self.grenade_img, (16, 20)),
-                         (self.heart.get_width() * i + 14 + i * 5, 40))
+            display.blit(pygame.transform.scale(self.grenade_img, (108, 110)),
+                         (self.heart.get_width() * i - 33 + i * 5,-5))
 
         if self.health < 1:
             self.health = 20
@@ -272,7 +272,6 @@ class GrenadeRight(pygame.sprite.Sprite):
         super().__init__()
         self.display = display
         self.v0 = v0
-        self.circle = []
         self.animation = Animations()
         self.animation_list = self.animation.load_animation('assets/grenade', [5, 5, 5])
         self.image_id = 0
@@ -281,7 +280,7 @@ class GrenadeRight(pygame.sprite.Sprite):
         self.animation_frame = 0
         self.cpt = 1
         self.image = pygame.image.load('assets/grenade/grenade_0.png')
-        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
+        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y-25))
 
     def update(self, display, scroll, tiles, ennemis):
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
@@ -296,7 +295,7 @@ class GrenadeRight(pygame.sprite.Sprite):
 
         for tile in tiles:
             if self.rect.colliderect(tile):
-                self.rect.bottom = tile.top
+                self.rect.bottom = tile.top + 20
                 self.hit = True
 
         if self.hit:
@@ -317,7 +316,11 @@ class GrenadeLeft(pygame.sprite.Sprite):
         super().__init__()
         self.display = display
         self.v0 = v0
-        self.circle = []
+        self.animation = Animations()
+        self.animation_list = self.animation.load_animation('assets/grenade', [5, 5, 5])
+        self.image_id = 0
+        self.hit = False
+        self.animation_frame = 0
         self.alpha = 45
         self.cpt = 1
         self.image = pygame.image.load('assets/grenade/grenade_0.png')
@@ -325,15 +328,25 @@ class GrenadeLeft(pygame.sprite.Sprite):
 
     def update(self, display, scroll, tiles, ennemis):
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
-        x = (self.v0 * cos(self.alpha)) * self.cpt
-        self.rect.x -= x / 11
-        self.rect.y -= (((-9.8 * (x ** 2)) / (2 * (self.v0 ** 2) * (cos(self.alpha) ** 2))) + (
-                tan(self.alpha) * x)) / 11
+        if not self.hit:
+            x = (self.v0 * cos(self.alpha)) * self.cpt
+            self.rect.x -= x / 11
+            self.rect.y -= (((-9.8 * (x ** 2)) / (2 * (self.v0 ** 2) * (cos(self.alpha) ** 2))) + (
+                    tan(self.alpha) * x)) / 11
 
-        self.cpt += 0.5
+            self.cpt += 0.5
 
         for tile in tiles:
             if self.rect.colliderect(tile):
+                self.rect.bottom = tile.top + 20
+                self.hit = True
+
+        if self.hit:
+            self.animation_frame += 1
+            if self.animation_frame < len(self.animation_list):
+                self.image_id = self.animation_list[self.animation_frame]
+                self.image = self.animation.animation_frames[self.image_id]
+            else:
                 for ennemi in ennemis:
                     if abs(self.rect.x - ennemi.ennemi_box.x) < 100:
                         ennemi.damage(10)
@@ -367,6 +380,8 @@ class Ennemi(pygame.sprite.Sprite):
 
     def update(self, display, scroll, tile_rects, player, bullet_groupe):
         display.blit(self.ennemi_img, (self.ennemi_box.x - scroll[0], self.ennemi_box.y - scroll[1]))
+        if self.health < 1:
+            self.kill()
         self.tiles = tile_rects
         if self.cpt > 240:
             self.cpt = 0
@@ -408,8 +423,6 @@ class Ennemi(pygame.sprite.Sprite):
         self.health_bar.fill((255, 0, 0))
         display.blit(self.health_bar, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
 
-        if self.health < 1:
-            self.kill()
 
         if 400 > self.ennemi_box.x - player.player_box.x > 0:
             if self.shootCooldown == 0:
