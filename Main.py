@@ -18,6 +18,7 @@ pygame.display.set_caption("The Shadow of the past")
 
 
 def Menu():
+    pygame.font.init()
     # Chargement et collage du fond
     display = pygame.Surface((1280, 720))
     fond = pygame.image.load('assets/Menu/bg_menu.png')
@@ -59,6 +60,7 @@ def Menu():
 
         if editor:
             LevelEditor()
+            Menu()
 
         for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
             if event.type == QUIT:  # Si un de ces événements est de type QUIT
@@ -102,8 +104,8 @@ def Game():
     ennemi_groupe = map.set_mobs(ennemi_groupe)
     bullet_groupe = pygame.sprite.Group()
     grenade_groupe = pygame.sprite.Group()
-
-    while True:
+    Run = True
+    while Run:
 
         true_scroll[0] += (player.player_box.x - true_scroll[0] - 400) / 20
         true_scroll[1] += (player.player_box.y - true_scroll[1] - 555) / 20
@@ -190,6 +192,8 @@ def Game():
                 if event.key == K_UP:
                     if air_timer < 6:
                         player_y_momentum = -7
+                if event.key == K_ESCAPE:
+                    Run = False
             if event.type == KEYUP:
                 if event.key == K_RIGHT:
                     move_right = False
@@ -313,8 +317,8 @@ def LevelEditor():
 
     root = tk.Tk()
     root.withdraw()
-    run = True
-    while run:
+    Run = True
+    while Run:
         clock.tick(FPS)
         draw_text(f'{FPS}', font, WHITE, 1200, 870)
         draw_bg(bg)
@@ -371,7 +375,7 @@ def LevelEditor():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                Run = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     level += 1
@@ -383,6 +387,8 @@ def LevelEditor():
                     scroll_right = True
                 if event.key == pygame.K_LSHIFT:
                     scroll_speed = 5
+                if event.key == K_ESCAPE:
+                    Run = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     scroll_left = False
@@ -391,8 +397,7 @@ def LevelEditor():
                 if event.key == pygame.K_LSHIFT:
                     scroll_speed = 1
         pygame.display.update()
-        surf = pygame.transform.scale(display, WINDOW_SIZE)
-        screen.blit(surf, (0, 0))
+
     pygame.quit()
 
 
