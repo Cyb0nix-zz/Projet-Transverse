@@ -11,9 +11,63 @@ FPS = 120
 
 clock = pygame.time.Clock()
 pygame.init()
+pygame.font.init()
 
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("The Shadow of the past")
+
+
+def Menu():
+    # Chargement et collage du fond
+    display = pygame.Surface((1280, 720))
+    fond = pygame.image.load('assets/Menu/bg_menu.png')
+    display.blit(fond, (-2, 0))
+
+    # Création des polices d'écriture avec différentes tailles
+    title_font = pygame.font.Font('assets/Menu/Wargate.ttf', 85)
+    button_font = pygame.font.Font('assets/Menu/Cold_Warm.otf', 40)
+
+    # Création du texte pour le bouton jouer avec une police présente plus haut
+    title = title_font.render("Shadow Of Past", False, (243, 233, 210))
+    display.blit(title, (350, 60))
+
+    # Buttons
+    img_play = pygame.Surface((270, 60))
+    img_play.fill((26, 126, 95))
+    txt_play = button_font.render("Play", False, (243, 233, 210))
+    img_play.blit(txt_play,(90,10))
+    play_button = Button(500, 320, img_play, 1)
+
+    img_editor = pygame.Surface((270, 60))
+    img_editor.fill((26, 126, 95))
+    txt_editor = button_font.render("Level Editor", False, (243, 233, 210))
+    img_editor.blit(txt_editor, (15, 10))
+    editor_button = Button(500, 400, img_editor, 1)
+
+    play = False
+    editor = False
+
+    continuer = True
+    # Boucle infinie
+    while continuer:
+
+        play = play_button.draw(display)
+        editor = editor_button.draw(display)
+
+        if play:
+            Game()
+
+        if editor:
+            LevelEditor()
+
+        for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
+            if event.type == QUIT:  # Si un de ces événements est de type QUIT
+                continuer = False  # On arrête la boucle
+
+        surf = pygame.transform.scale(display, WINDOW_SIZE)
+        pygame.display.update()
+        screen.blit(surf, (0, 0))
+        clock.tick(FPS)
 
 
 def Game():
@@ -147,13 +201,14 @@ def Game():
         screen.blit(surf, (0, 0))
         clock.tick(FPS)
 
+
 def LevelEditor():
+    pygame.display.set_caption("The Shadow of the past Level Editor")
+
     # Taille de la fenêtre (avec taille marges)
-    LOWER_MARGIN = 100
     SIDE_MARGIN = 500
     SCREEN_WIDTH = 1281
     SCREEN_HEIGHT = 897
-
 
     # Variables
     ROWS = 29
@@ -340,5 +395,5 @@ def LevelEditor():
         screen.blit(surf, (0, 0))
     pygame.quit()
 
-LevelEditor()
 
+Menu()
