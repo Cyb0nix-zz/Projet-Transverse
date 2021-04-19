@@ -1,4 +1,6 @@
 import sys
+from time import sleep
+
 from Class import *
 import csv
 import os
@@ -17,7 +19,10 @@ screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("The Shadow of the past")
 
 
-def Menu():
+def Menu(screen):
+    screen = pygame.display.set_mode(WINDOW_SIZE)
+    pygame.display.set_caption("The Shadow of the past")
+    pygame.display.update()
     pygame.font.init()
     # Chargement et collage du fond
     display = pygame.Surface((1280, 720))
@@ -30,7 +35,7 @@ def Menu():
 
     # Création du texte pour le bouton jouer avec une police présente plus haut
     title = title_font.render("Shadow Of Past", False, (243, 233, 210))
-    display.blit(title, (350, 60))
+    display.blit(title, (350, 80))
 
     # Buttons
     img_play = pygame.Surface((270, 60))
@@ -51,16 +56,14 @@ def Menu():
     continuer = True
     # Boucle infinie
     while continuer:
-
         play = play_button.draw(display)
         editor = editor_button.draw(display)
-
         if play:
-            Game()
-
+            Game(screen)
+            play = False
         if editor:
             LevelEditor()
-            Menu()
+            editor = False
 
         for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
             if event.type == QUIT:  # Si un de ces événements est de type QUIT
@@ -72,7 +75,7 @@ def Menu():
         clock.tick(FPS)
 
 
-def Game():
+def Game(screen):
     display = pygame.Surface((1280, 704))
 
     map = Map("map", display, TILE_SIZE)
@@ -104,101 +107,179 @@ def Game():
     ennemi_groupe = map.set_mobs(ennemi_groupe)
     bullet_groupe = pygame.sprite.Group()
     grenade_groupe = pygame.sprite.Group()
-    Run = True
-    while Run:
+    run = True
+    alive = True
+    replay = False
+    menu = False
+    pause = False
+    play = False
+    while run:
+        if alive and not pause:
+            true_scroll[0] += (player.player_box.x - true_scroll[0] - 400) / 20
+            true_scroll[1] += (player.player_box.y - true_scroll[1] - 555) / 20
+            scroll = true_scroll.copy()
+            scroll[0] = int(scroll[0])
+            scroll[1] = int(scroll[1])
 
-        true_scroll[0] += (player.player_box.x - true_scroll[0] - 400) / 20
-        true_scroll[1] += (player.player_box.y - true_scroll[1] - 555) / 20
-        scroll = true_scroll.copy()
-        scroll[0] = int(scroll[0])
-        scroll[1] = int(scroll[1])
+            tile_rects = map.update(scroll)
 
-        tile_rects = map.update(scroll)
+            player_movement = [0, 0]
 
-        player_movement = [0, 0]
+            if move_right:
+                player_movement[0] += 4
+            if move_left:
+                player_movement[0] -= 4
+            player_movement[1] += player_y_momentum
+            player_y_momentum += 0.6
+            if player_y_momentum > 3:
+                player_y_momentum = 3
 
-        if move_right:
-            player_movement[0] += 4
-        if move_left:
-            player_movement[0] -= 4
-        player_movement[1] += player_y_momentum
-        player_y_momentum += 0.6
-        if player_y_momentum > 3:
-            player_y_momentum = 3
+            if player_movement[0] > 0 and player_movement[1] == 0:
+                player_action, player_frame = animation.change_action(player_action, player_frame, 'walk')
+                player_flip = False
 
-        if player_movement[0] > 0 and player_movement[1] == 0:
-            player_action, player_frame = animation.change_action(player_action, player_frame, 'walk')
-            player_flip = False
+            if player_movement[0] == 0:
+                player_action, player_frame = animation.change_action(player_action, player_frame, 'idle')
 
-        if player_movement[0] == 0:
-            player_action, player_frame = animation.change_action(player_action, player_frame, 'idle')
+            if player_movement[0] < 0 and player_movement[1] == 0:
+                player_action, player_frame = animation.change_action(player_action, player_frame, 'walk')
+                player_flip = True
 
-        if player_movement[0] < 0 and player_movement[1] == 0:
-            player_action, player_frame = animation.change_action(player_action, player_frame, 'walk')
-            player_flip = True
+            if player_movement[1] < 0 and player_movement[0] == 0:
+                player_action, player_frame = animation.change_action(player_action, player_frame, 'jumpold')
 
-        if player_movement[1] < 0 and player_movement[0] == 0:
-            player_action, player_frame = animation.change_action(player_action, player_frame, 'jumpold')
+            if player_movement[1] < 0 and player_movement[0] > 0:
+                player_action, player_frame = animation.change_action(player_action, player_frame, 'jump')
 
-        if player_movement[1] < 0 and player_movement[0] > 0:
-            player_action, player_frame = animation.change_action(player_action, player_frame, 'jump')
+            player.move(player_movement, tile_rects)
+            if player.collision_types['bottom']:
+                player_y_momentum = 0
+                air_timer = 0
+            else:
+                air_timer += 1
 
-        player.move(player_movement, tile_rects)
-        if player.collision_types['bottom']:
-            player_y_momentum = 0
-            air_timer = 0
-        else:
-            air_timer += 1
+            player_frame += 1
+            if player_frame >= len(animation_database[player_action]):
+                player_frame = 0
 
-        player_frame += 1
-        if player_frame >= len(animation_database[player_action]):
-            player_frame = 0
+            player_image_id = animation_database[player_action][player_frame]
+            player_img = animation.animation_frames[player_image_id]
 
-        player_image_id = animation_database[player_action][player_frame]
-        player_img = animation.animation_frames[player_image_id]
+            bullet_groupe.update(display, scroll, tile_rects, ennemi_groupe, player)
+            alive = player.update(pygame.transform.flip(player_img, player_flip, False), display, scroll)
+            ennemi_groupe.update(display, scroll, tile_rects, player, bullet_groupe)
+            grenade_groupe.update(display, scroll, tile_rects, ennemi_groupe)
 
-        bullet_groupe.update(display, scroll, tile_rects, ennemi_groupe, player)
-        player.update(pygame.transform.flip(player_img, player_flip, False), display, scroll)
-        ennemi_groupe.update(display, scroll, tile_rects, player, bullet_groupe)
-        grenade_groupe.update(display, scroll, tile_rects, ennemi_groupe)
+            if launch_grenade:
+                if v0_grenade < 60:
+                    v0_grenade += 0.8
 
-        if launch_grenade:
-            if v0_grenade < 60:
-                v0_grenade += 0.8
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        bullet_groupe.add(player.shoot(WINDOW_SIZE, player_flip))
+                    if event.button == 3:
+                        if player.nbr_grenade > 0:
+                            launch_grenade = True
 
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    bullet_groupe.add(player.shoot(WINDOW_SIZE, player_flip))
-                if event.button == 3:
-                    if player.nbr_grenade > 0:
-                        launch_grenade = True
+                if event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 3:
+                        if player.nbr_grenade > 0:
+                            grenade_groupe.add(player.grenade(WINDOW_SIZE, player_flip, v0_grenade))
+                            launch_grenade = False
+                            v0_grenade = 30
 
-            if event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 3:
-                    if player.nbr_grenade > 0:
-                        grenade_groupe.add(player.grenade(WINDOW_SIZE, player_flip, v0_grenade))
-                        launch_grenade = False
-                        v0_grenade = 30
+                if event.type == KEYDOWN:
+                    if event.key == K_RIGHT:
+                        move_right = True
+                    if event.key == K_LEFT:
+                        move_left = True
+                    if event.key == K_UP:
+                        if air_timer < 6:
+                            player_y_momentum = -7
+                    if event.key == K_ESCAPE:
+                        pause = True
+                if event.type == KEYUP:
+                    if event.key == K_RIGHT:
+                        move_right = False
+                    if event.key == K_LEFT:
+                        move_left = False
+        elif not alive:
+            fond = pygame.image.load('assets/Menu/bg_menu.png')
+            display.blit(fond, (-2, 0))
+            title_font = pygame.font.Font('assets/Menu/Wargate.ttf', 85)
+            button_font = pygame.font.Font('assets/Menu/Cold_Warm.otf', 40)
 
-            if event.type == KEYDOWN:
-                if event.key == K_RIGHT:
-                    move_right = True
-                if event.key == K_LEFT:
-                    move_left = True
-                if event.key == K_UP:
-                    if air_timer < 6:
-                        player_y_momentum = -7
-                if event.key == K_ESCAPE:
-                    Run = False
-            if event.type == KEYUP:
-                if event.key == K_RIGHT:
-                    move_right = False
-                if event.key == K_LEFT:
-                    move_left = False
+            title = title_font.render("Game over", False, (243, 233, 210))
+            display.blit(title, (440, 150))
+
+            img_replay = pygame.Surface((270, 60))
+            img_replay.fill((26, 126, 95))
+            txt_replay = button_font.render("Replay", False, (243, 233, 210))
+            img_replay.blit(txt_replay, (90, 10))
+            replay_button = Button(500, 320, img_replay, 1)
+
+            img_menu = pygame.Surface((270, 60))
+            img_menu.fill((26, 126, 95))
+            txt_menu = button_font.render("Menu", False, (243, 233, 210))
+            img_menu.blit(txt_menu, (105, 10))
+            menu_button = Button(500, 400, img_menu, 1)
+
+            replay = replay_button.draw(display)
+            menu = menu_button.draw(display)
+            if replay:
+                Game(screen)
+                replay = False
+            if menu:
+                menu = False
+                sleep(0.1)
+                Menu(screen)
+
+
+            for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
+                if event.type == QUIT:  # Si un de ces événements est de type QUIT
+                    pygame.quit()  # On arrête la boucle
+
+        elif pause:
+            fond = pygame.image.load('assets/Menu/bg_menu.png')
+            display.blit(fond, (-2, 0))
+            title_font = pygame.font.Font('assets/Menu/Wargate.ttf', 85)
+            button_font = pygame.font.Font('assets/Menu/Cold_Warm.otf', 40)
+
+            title = title_font.render("Pause", False, (243, 233, 210))
+            display.blit(title, (520, 150))
+
+            img_play = pygame.Surface((270, 60))
+            img_play.fill((26, 126, 95))
+            txt_play = button_font.render("Play", False, (243, 233, 210))
+            img_play.blit(txt_play, (90, 10))
+            play_button = Button(500, 320, img_play, 1)
+
+            img_menu = pygame.Surface((270, 60))
+            img_menu.fill((26, 126, 95))
+            txt_menu = button_font.render("Menu", False, (243, 233, 210))
+            img_menu.blit(txt_menu, (85, 10))
+            menu_button = Button(500, 400, img_menu, 1)
+
+            play = play_button.draw(display)
+            menu = menu_button.draw(display)
+            if play:
+                pause = False
+            if menu:
+                menu = False
+                sleep(0.1)
+                Menu(screen)
+
+
+            for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
+                if event.type == QUIT:  # Si un de ces événements est de type QUIT
+                    pygame.quit()  # On arrête la boucle
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        pause = False
 
         surf = pygame.transform.scale(display, WINDOW_SIZE)
         pygame.display.update()
@@ -207,12 +288,13 @@ def Game():
 
 
 def LevelEditor():
-    pygame.display.set_caption("The Shadow of the past Level Editor")
+
 
     # Taille de la fenêtre (avec taille marges)
     SIDE_MARGIN = 500
-    SCREEN_WIDTH = 1281
+    SCREEN_WIDTH = 1280
     SCREEN_HEIGHT = 897
+
 
     # Variables
     ROWS = 29
@@ -228,6 +310,7 @@ def LevelEditor():
     grid = 0
 
     display = pygame.display.set_mode((SCREEN_WIDTH + SIDE_MARGIN, SCREEN_HEIGHT))
+    pygame.display.set_caption("The Shadow of the past Level Editor")
 
     # Background
     bg_0 = pygame.image.load('LevelEditor/bg/0.png').convert_alpha()
@@ -250,7 +333,6 @@ def LevelEditor():
     # Couleurs
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
-    RED = (200, 25, 25)
     GREEN = (144, 201, 120)
 
     font = pygame.font.SysFont('Futura', 30)
@@ -389,6 +471,7 @@ def LevelEditor():
                     scroll_speed = 5
                 if event.key == K_ESCAPE:
                     Run = False
+                    Menu(screen)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     scroll_left = False
@@ -401,4 +484,4 @@ def LevelEditor():
     pygame.quit()
 
 
-Menu()
+Menu(screen)
