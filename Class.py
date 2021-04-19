@@ -159,6 +159,11 @@ class Player(pygame.sprite.Sprite):
         display.blit(self.health_bar_under, (self.player_box.x + 5 - scroll[0], self.player_box.y - 5 - scroll[1]))
         display.blit(self.health_bar, (self.player_box.x + 5 - scroll[0], self.player_box.y - 5 - scroll[1]))
 
+        if self.lives > 0:
+            return True
+        else:
+            return False
+
     def shoot(self, display, direction):
 
         if direction:
