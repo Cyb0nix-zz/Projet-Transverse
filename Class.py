@@ -172,7 +172,7 @@ class Player(pygame.sprite.Sprite):
         if direction:
             return BulletLeft(self.player_box.x - 25, self.player_box.y, self.attack, display)
         else:
-            return BulletRight(self.player_box.x + 25, self.player_box.y, self.attack, display)
+            return BulletRight(self.player_box.x + 28, self.player_box.y, self.attack, display)
 
     def grenade(self, display, direction, v0):
         if direction:
@@ -217,7 +217,7 @@ class BulletRight(pygame.sprite.Sprite):
         self.damage = damage
         self.image = pygame.Surface((5, 2))
         self.image.fill((255, 255, 0))
-        self.rect = self.image.get_rect(center=(pos_x + 15, pos_y + 24))
+        self.rect = self.image.get_rect(center=(pos_x + 15, pos_y + 24.5))
 
     def update(self, display, scroll, tiles, ennemi_groupe, player):
 

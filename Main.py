@@ -8,7 +8,8 @@ import tkinter as tk
 
 WINDOW_SIZE = (1280, 720)
 TILE_SIZE = 32
-FPS = 120
+FPS = 60
+
 
 clock = pygame.time.Clock()
 pygame.init()
@@ -304,7 +305,7 @@ def LevelEditor():
     ROWS = 29
     MAX_COLS = 312
     TILE_SIZE = 32
-    TILE_TYPES = 134
+    TILE_TYPES = 75
     level = 0
     scroll_left = False
     scroll_right = False
