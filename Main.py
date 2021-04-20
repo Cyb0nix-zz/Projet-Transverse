@@ -97,7 +97,7 @@ def Game(screen):
     player_frame = 0
     player_flip = False
 
-    player = Player("Cybonix", 20, 4, 4, 57)
+    player = Player("Cybonix", 20, 4, 3, 3)
     player.setLocation(400, 540)
 
     true_scroll = [0, 0]
