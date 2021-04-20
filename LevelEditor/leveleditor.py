@@ -20,7 +20,7 @@ SIDE_MARGIN = 500
 ROWS = 29
 MAX_COLS = 312
 TILE_SIZE = 32
-TILE_TYPES = 119
+TILE_TYPES = 75
 level = 0
 scroll_left = False
 scroll_right = False
@@ -119,7 +119,7 @@ for i in range(len(img_list)):
     tile_button = button.Button(SCREEN_WIDTH + (50 * button_col) + 50, 50 * button_row + 50, img_list[i], 1)
     button_list.append(tile_button)
     button_col += 1
-    if button_col == 9:
+    if button_col == 8:
         button_row += 1
         button_col = 0
 
