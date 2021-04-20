@@ -8,7 +8,7 @@ class Map():
         self.TILE_SIZE = TILE_SIZE
         self.screen = screen
         self.path = path
-        self.background = pygame.image.load('textures/Background/Map_ville.png')
+        self.background = pygame.image.load('LevelEditor/bg/0.png')
         self.wall_block = pygame.image.load('textures/wall_building.png')
         self.windows_block = pygame.image.load('textures/building_night_light_on.png')
 
