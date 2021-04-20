@@ -18,7 +18,6 @@ pygame.font.init()
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("The Shadow of the past")
 
-
 def Menu(screen):
     screen = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("The Shadow of the past")
@@ -28,6 +27,10 @@ def Menu(screen):
     display = pygame.Surface((1280, 720))
     fond = pygame.image.load('assets/Menu/bg_menu.png')
     display.blit(fond, (-2, 0))
+
+    music1 = pygame.mixer.Sound('assets/music.wav')
+    music1.play()
+    music1.set_volume(0.01)
 
     # Création des polices d'écriture avec différentes tailles
     title_font = pygame.font.Font('assets/Menu/Wargate.ttf', 85)
@@ -179,7 +182,11 @@ def Game(screen):
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
+
                     if event.button == 1:
+                        tir = pygame.mixer.Sound('assets/tir.wav')
+                        tir.play()
+                        tir.set_volume(0.01)
                         bullet_groupe.add(player.shoot(WINDOW_SIZE, player_flip))
                     if event.button == 3:
                         if player.nbr_grenade > 0:

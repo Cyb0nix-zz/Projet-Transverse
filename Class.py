@@ -297,7 +297,9 @@ class GrenadeRight(pygame.sprite.Sprite):
             if self.rect.colliderect(tile):
                 self.rect.bottom = tile.top + 20
                 self.hit = True
-
+                explosion = pygame.mixer.Sound('assets/explosion.wav')
+                explosion.play()
+                explosion.set_volume(0.01)
         if self.hit:
             self.animation_frame += 1
             if self.animation_frame < len(self.animation_list):
@@ -340,7 +342,9 @@ class GrenadeLeft(pygame.sprite.Sprite):
             if self.rect.colliderect(tile):
                 self.rect.bottom = tile.top + 20
                 self.hit = True
-
+                explosion = pygame.mixer.Sound('assets/explosion.wav')
+                explosion.play()
+                explosion.set_volume(0.01)
         if self.hit:
             self.animation_frame += 1
             if self.animation_frame < len(self.animation_list):
