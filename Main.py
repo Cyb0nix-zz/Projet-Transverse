@@ -80,7 +80,7 @@ def Menu(screen):
 
 
 def Game(screen):
-    display = pygame.Surface((945, 520))
+    display = pygame.Surface((1280, 704))
 
     map = Map("map", display, TILE_SIZE)
 
@@ -97,7 +97,7 @@ def Game(screen):
     player_frame = 0
     player_flip = False
 
-    player = Player("Cybonix", 20, 4, 4, 3)
+    player = Player("Cybonix", 20, 4, 4, 57)
     player.setLocation(400, 540)
 
     true_scroll = [0, 0]
@@ -120,7 +120,7 @@ def Game(screen):
     while run:
         if alive and not pause:
             true_scroll[0] += (player.player_box.x - true_scroll[0] - 400) / 20
-            true_scroll[1] += (player.player_box.y - true_scroll[1] - 371) / 20
+            true_scroll[1] += (player.player_box.y - true_scroll[1] - 555) / 20
             scroll = true_scroll.copy()
             scroll[0] = int(scroll[0])
             scroll[1] = int(scroll[1])

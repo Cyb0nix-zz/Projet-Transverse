@@ -177,10 +177,10 @@ class Player(pygame.sprite.Sprite):
     def grenade(self, display, direction, v0):
         if direction:
             self.nbr_grenade -= 1
-            return GrenadeLeft(self.player_box.x, self.player_box.y, display, v0)
+            return GrenadeLeft(self.player_box.x-10, self.player_box.y+60, display, v0)
         else:
             self.nbr_grenade -= 1
-            return GrenadeRight(self.player_box.x, self.player_box.y, display, v0)
+            return GrenadeRight(self.player_box.x-10, self.player_box.y+60, display, v0)
 
     def get_pseudo(self):
         return self.pseudo
