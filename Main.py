@@ -28,9 +28,9 @@ def Menu(screen):
     fond = pygame.image.load('assets/Menu/bg_menu.png')
     display.blit(fond, (-2, 0))
 
-    music1 = pygame.mixer.Sound('assets/music.wav')
-    music1.play()
-    music1.set_volume(0.01)
+    menu_music = pygame.mixer.Sound('assets/music.wav')
+    menu_music.play()
+    menu_music.set_volume(0.01)
 
     # Création des polices d'écriture avec différentes tailles
     title_font = pygame.font.Font('assets/Menu/Wargate.ttf', 85)
@@ -62,6 +62,7 @@ def Menu(screen):
         play = play_button.draw(display)
         editor = editor_button.draw(display)
         if play:
+            menu_music.fadeout(300)
             Game(screen)
             play = False
         if editor:
