@@ -1,6 +1,5 @@
 import sys
 from time import sleep
-
 from Class import *
 import csv
 import os
@@ -25,16 +24,16 @@ def Menu(screen):
     pygame.font.init()
     # Chargement et collage du fond
     display = pygame.Surface((1280, 720))
-    fond = pygame.image.load('assets/Menu/bg_menu.png')
+    fond = pygame.image.load('Assets/Menu/bg_menu.png')
     display.blit(fond, (-2, 0))
 
-    menu_music = pygame.mixer.Sound('assets/music.wav')
+    menu_music = pygame.mixer.Sound('Assets/Sounds/music.wav')
     menu_music.play()
     menu_music.set_volume(0.01)
 
     # Création des polices d'écriture avec différentes tailles
-    title_font = pygame.font.Font('assets/Menu/Wargate.ttf', 85)
-    button_font = pygame.font.Font('assets/Menu/Cold_Warm.otf', 40)
+    title_font = pygame.font.Font('Assets/Menu/Wargate.ttf', 85)
+    button_font = pygame.font.Font('Assets/Menu/Cold_Warm.otf', 40)
 
     # Création du texte pour le bouton jouer avec une police présente plus haut
     title = title_font.render("Shadow Of Past", False, (243, 233, 210))
@@ -88,10 +87,10 @@ def Game(screen):
 
     animation_database = {}
 
-    animation_database['walk'] = animation.load_animation('Character/walk', [5, 5, 5, 5, 5, 5])
-    animation_database['idle'] = animation.load_animation('Character/idle', [7, 7])
-    animation_database['jump'] = animation.load_animation('Character/jump', [7, 7, 7, 7])
-    animation_database['jumpold'] = animation.load_animation('Character/jumpold', [7, 7, 7, 7, 7])
+    animation_database['walk'] = animation.load_animation('Characters/Player/walk', [5, 5, 5, 5, 5, 5])
+    animation_database['idle'] = animation.load_animation('Characters/Player/idle', [7, 7])
+    animation_database['jump'] = animation.load_animation('Characters/Player/jump', [7, 7, 7, 7])
+    animation_database['jumpold'] = animation.load_animation('Characters/Player/jumpold', [7, 7, 7, 7, 7])
 
     player_action = 'idle'
     player_frame = 0
@@ -213,10 +212,10 @@ def Game(screen):
                     if event.key == K_LEFT:
                         move_left = False
         elif not alive:
-            fond = pygame.image.load('assets/Menu/bg_menu.png')
+            fond = pygame.image.load('Assets/Menu/bg_menu.png')
             display.blit(fond, (-2, 0))
-            title_font = pygame.font.Font('assets/Menu/Wargate.ttf', 85)
-            button_font = pygame.font.Font('assets/Menu/Cold_Warm.otf', 40)
+            title_font = pygame.font.Font('Assets/Menu/Wargate.ttf', 85)
+            button_font = pygame.font.Font('Assets/Menu/Cold_Warm.otf', 40)
 
             title = title_font.render("Game over", False, (243, 233, 210))
             display.blit(title, (440, 150))
@@ -249,10 +248,10 @@ def Game(screen):
                     pygame.quit()  # On arrête la boucle
 
         elif pause:
-            fond = pygame.image.load('assets/Menu/bg_menu.png')
+            fond = pygame.image.load('Assets/Menu/bg_menu.png')
             display.blit(fond, (-2, 0))
-            title_font = pygame.font.Font('assets/Menu/Wargate.ttf', 85)
-            button_font = pygame.font.Font('assets/Menu/Cold_Warm.otf', 40)
+            title_font = pygame.font.Font('Assets/Menu/Wargate.ttf', 85)
+            button_font = pygame.font.Font('Assets/Menu/Cold_Warm.otf', 40)
 
             title = title_font.render("Pause", False, (243, 233, 210))
             display.blit(title, (520, 150))
@@ -487,6 +486,5 @@ def LevelEditor():
         pygame.display.update()
 
     pygame.quit()
-
 
 Menu(screen)

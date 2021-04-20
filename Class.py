@@ -84,11 +84,11 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, pseudo, health, lives, attack, nbr_grenade):
         super().__init__()
-        self.player_img = pygame.image.load('Character/idle/idle_0.png')
-        self.heart = pygame.image.load('assets/life.gif')
-        self.shoot_sound = pygame.mixer.Sound('assets/tir.wav')
+        self.player_img = pygame.image.load('Characters/Player/idle/idle_0.png')
+        self.heart = pygame.image.load('Assets/life.gif')
+        self.shoot_sound = pygame.mixer.Sound('Assets/Sounds/tir.wav')
         self.shoot_sound.set_volume(0.01)
-        self.grenade_img = pygame.image.load('assets/grenade/grenade_0.png')
+        self.grenade_img = pygame.image.load('Assets/grenade/grenade_0.png')
         self.player_box = self.player_img.get_rect()
         self.pseudo = pseudo
         self.health = health
@@ -149,7 +149,7 @@ class Player(pygame.sprite.Sprite):
 
         for i in range(self.nbr_grenade):
             display.blit(pygame.transform.scale(self.grenade_img, (108, 110)),
-                         (self.heart.get_width() * i - 33 + i * 5,-5))
+                         (self.heart.get_width() * i - 33 + i * 5, -5))
 
         if self.health < 1:
             self.health = 20
@@ -276,16 +276,16 @@ class GrenadeRight(pygame.sprite.Sprite):
         self.display = display
         self.v0 = v0
         self.animation = Animations()
-        self.animation_list = self.animation.load_animation('assets/grenade', [5, 5, 5])
-        self.explosion_sound = pygame.mixer.Sound('assets/explosion.wav')
+        self.animation_list = self.animation.load_animation('Assets/grenade', [5, 5, 5])
+        self.explosion_sound = pygame.mixer.Sound('Assets/Sounds/explosion.wav')
         self.explosion_sound.set_volume(0.01)
         self.image_id = 0
         self.alpha = 45
         self.hit = False
         self.animation_frame = 0
         self.cpt = 1
-        self.image = pygame.image.load('assets/grenade/grenade_0.png')
-        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y-25))
+        self.image = pygame.image.load('Assets/grenade/grenade_0.png')
+        self.rect = self.image.get_rect(center=(pos_x + 40, pos_y - 25))
 
     def update(self, display, scroll, tiles, ennemis):
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
@@ -316,22 +316,21 @@ class GrenadeRight(pygame.sprite.Sprite):
                 self.kill()
 
 
-
 class GrenadeLeft(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, display, v0):
         super().__init__()
         self.display = display
         self.v0 = v0
         self.animation = Animations()
-        self.explosion_sound = pygame.mixer.Sound('assets/explosion.wav')
+        self.explosion_sound = pygame.mixer.Sound('Assets/Sounds/explosion.wav')
         self.explosion_sound.set_volume(0.01)
-        self.animation_list = self.animation.load_animation('assets/grenade', [5, 5, 5])
+        self.animation_list = self.animation.load_animation('Assets/grenade', [5, 5, 5])
         self.image_id = 0
         self.hit = False
         self.animation_frame = 0
         self.alpha = 45
         self.cpt = 1
-        self.image = pygame.image.load('assets/grenade/grenade_0.png')
+        self.image = pygame.image.load('Assets/grenade/grenade_0.png')
         self.rect = self.image.get_rect(center=(pos_x + 40, pos_y + 35))
 
     def update(self, display, scroll, tiles, ennemis):
@@ -364,7 +363,7 @@ class GrenadeLeft(pygame.sprite.Sprite):
 class Ennemi(pygame.sprite.Sprite):
     def __init__(self, health, attack, pos_x, pos_y):
         super().__init__()
-        self.ennemi_img = pygame.image.load('Character/Ennemi/idle/idle_0.png')
+        self.ennemi_img = pygame.image.load('Characters/Ennemi/idle/idle_0.png')
         self.ennemi_box = self.ennemi_img.get_rect()
         self.ennemi_box.x = pos_x
         self.ennemi_box.y = pos_y
@@ -375,7 +374,7 @@ class Ennemi(pygame.sprite.Sprite):
         self.shootCooldown = 0
         self.direction = -1
         self.ennemi_momentum = 0
-        self.shoot_sound = pygame.mixer.Sound('assets/tir.wav')
+        self.shoot_sound = pygame.mixer.Sound('Assets/Sounds/tir.wav')
         self.shoot_sound.set_volume(0.01)
 
     def shoot(self, display, direction):
@@ -397,10 +396,10 @@ class Ennemi(pygame.sprite.Sprite):
             self.cpt = 0
             self.direction *= -1
         if self.direction == -1:
-            self.ennemi_img = pygame.transform.flip(pygame.image.load('Character/Ennemi/idle/idle_0.png'), True, False)
+            self.ennemi_img = pygame.transform.flip(pygame.image.load('Characters/Ennemi/idle/idle_0.png'), True, False)
             self.ennemi_box.x -= 1
         if self.direction == 1:
-            self.ennemi_img = pygame.transform.flip(pygame.image.load('Character/Ennemi/idle/idle_0.png'), False, False)
+            self.ennemi_img = pygame.transform.flip(pygame.image.load('Characters/Ennemi/idle/idle_0.png'), False, False)
             self.ennemi_box.x += 1
         self.cpt += 1
 
@@ -436,7 +435,6 @@ class Ennemi(pygame.sprite.Sprite):
             self.health_bar = pygame.Surface((self.health, 2))
             self.health_bar.fill((255, 0, 0))
             display.blit(self.health_bar, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
-
 
         if 400 > self.ennemi_box.x - player.player_box.x > 0:
             if self.shootCooldown == 0:
