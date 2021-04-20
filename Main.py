@@ -8,8 +8,7 @@ import tkinter as tk
 
 WINDOW_SIZE = (1280, 720)
 TILE_SIZE = 32
-FPS = 120
-
+FPS = 60
 clock = pygame.time.Clock()
 pygame.init()
 pygame.font.init()
@@ -248,6 +247,7 @@ def Game(screen):
                     pygame.quit()  # On arrête la boucle
 
         elif pause:
+            display = pygame.Surface((945, 520))
             fond = pygame.image.load('Assets/Menu/bg_menu.png')
             display.blit(fond, (-2, 0))
             title_font = pygame.font.Font('Assets/Menu/Wargate.ttf', 85)
