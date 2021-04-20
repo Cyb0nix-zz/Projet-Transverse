@@ -79,7 +79,7 @@ def Menu(screen):
 
 
 def Game(screen):
-    display = pygame.Surface((1280, 704))
+    display = pygame.Surface((945, 520))
 
     map = Map("map", display, TILE_SIZE)
 
@@ -119,7 +119,7 @@ def Game(screen):
     while run:
         if alive and not pause:
             true_scroll[0] += (player.player_box.x - true_scroll[0] - 400) / 20
-            true_scroll[1] += (player.player_box.y - true_scroll[1] - 555) / 20
+            true_scroll[1] += (player.player_box.y - true_scroll[1] - 371) / 20
             scroll = true_scroll.copy()
             scroll[0] = int(scroll[0])
             scroll[1] = int(scroll[1])
