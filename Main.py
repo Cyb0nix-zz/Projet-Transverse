@@ -184,9 +184,6 @@ def Game(screen):
                 if event.type == pygame.MOUSEBUTTONDOWN:
 
                     if event.button == 1:
-                        tir = pygame.mixer.Sound('assets/tir.wav')
-                        tir.play()
-                        tir.set_volume(0.01)
                         bullet_groupe.add(player.shoot(WINDOW_SIZE, player_flip))
                     if event.button == 3:
                         if player.nbr_grenade > 0:
