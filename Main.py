@@ -112,7 +112,7 @@ def Game(screen):
     launch_grenade = False
     air_timer = 0
     ennemi_groupe = pygame.sprite.Group()
-    #ennemi_groupe = map.set_mobs(ennemi_groupe)
+    ennemi_groupe = map.set_mobs(ennemi_groupe)
     bullet_groupe = pygame.sprite.Group()
     grenade_groupe = pygame.sprite.Group()
     run = True
