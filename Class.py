@@ -32,7 +32,7 @@ class Map():
         for row in self.world_data:
             x = 0
             for tile in row:
-                if tile == '75':
+                if tile == 75:
                     ennemi_groupe.add(Ennemi(20, 2, x * self.TILE_SIZE, y * self.TILE_SIZE))
                 x += 1
             y += 1
