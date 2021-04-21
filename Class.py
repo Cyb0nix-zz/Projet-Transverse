@@ -256,6 +256,7 @@ class BulletRight(pygame.sprite.Sprite):
                 if self.rect.colliderect(ennemi.ennemi_box):
                     ennemi.damage(self.damage)
                     self.kill()
+                    
         if self.rect.colliderect(player.player_box):
             player.damage(self.damage)
             self.kill()
