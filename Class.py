@@ -32,7 +32,7 @@ class Map():
         for row in self.world_data:
             x = 0
             for tile in row:
-                if tile == '75':
+                if tile == 75:
                     ennemi_groupe.add(Ennemi(20, 2, x * self.TILE_SIZE, y * self.TILE_SIZE))
                 x += 1
             y += 1
@@ -107,7 +107,7 @@ class Player(pygame.sprite.Sprite):
         self.player_box.y = y
         self.player_box.x = x
 
-    def move(self, movement, tile_rects):
+    def move(self, movement, tile_rects,map,ennemis):
         self.movement = movement
         self.tiles = tile_rects
         self.collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
@@ -147,6 +147,7 @@ class Player(pygame.sprite.Sprite):
 
         if self.player_box.y > 900:
             sleep(0.5)
+            map.set_mobs(ennemis)
             self.lives -= 1
             self.player_box.x = 450
             self.player_box.y = 600
@@ -187,10 +188,10 @@ class Player(pygame.sprite.Sprite):
     def grenade(self, display, direction, v0):
         if direction:
             self.nbr_grenade -= 1
-            return GrenadeLeft(self.player_box.x-10, self.player_box.y+60, display, v0)
+            return GrenadeLeft(self.player_box.x - 60, self.player_box.y, display, v0)
         else:
             self.nbr_grenade -= 1
-            return GrenadeRight(self.player_box.x-10, self.player_box.y+60, display, v0)
+            return GrenadeRight(self.player_box.x - 10, self.player_box.y+40, display, v0)
 
     def get_pseudo(self):
         return self.pseudo
@@ -302,15 +303,14 @@ class GrenadeRight(pygame.sprite.Sprite):
 
         if not self.hit:
             x = (self.v0 * cos(self.alpha)) * self.cpt
-            self.rect.x += x / 11
+            self.rect.x += x / 14
             self.rect.y -= (((-9.8 * (x ** 2)) / (2 * (self.v0 ** 2) * (cos(self.alpha) ** 2))) + (
-                    tan(self.alpha) * x)) / 11
+                    tan(self.alpha) * x)) / 14
 
             self.cpt += 0.5
 
         for tile in tiles:
             if self.rect.colliderect(tile):
-                self.rect.bottom = tile.top + 20
                 self.hit = True
                 self.explosion_sound.play()
 
@@ -347,15 +347,14 @@ class GrenadeLeft(pygame.sprite.Sprite):
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
         if not self.hit:
             x = (self.v0 * cos(self.alpha)) * self.cpt
-            self.rect.x -= x / 11
+            self.rect.x -= x / 14
             self.rect.y -= (((-9.8 * (x ** 2)) / (2 * (self.v0 ** 2) * (cos(self.alpha) ** 2))) + (
-                    tan(self.alpha) * x)) / 11
+                    tan(self.alpha) * x)) / 14
 
             self.cpt += 0.5
 
         for tile in tiles:
             if self.rect.colliderect(tile):
-                self.rect.bottom = tile.top + 20
                 self.hit = True
                 self.explosion_sound.play()
         if self.hit:
@@ -402,7 +401,7 @@ class Ennemi(pygame.sprite.Sprite):
         if self.health < 1:
             self.kill()
         self.tiles = tile_rects
-        if self.cpt > 240:
+        if self.cpt > 140:
             self.cpt = 0
             self.direction *= -1
         if self.direction == -1:
@@ -459,6 +458,9 @@ class Ennemi(pygame.sprite.Sprite):
                 self.shootCooldown = 50
         if self.shootCooldown > 0:
             self.shootCooldown -= 1
+
+        if self.ennemi_box.y > 800:
+            self.kill()
 
     def damage(self, damage):
 
