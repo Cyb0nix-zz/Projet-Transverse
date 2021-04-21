@@ -11,6 +11,7 @@ TILE_SIZE = 32
 FPS = 60
 
 
+
 clock = pygame.time.Clock()
 pygame.init()
 pygame.font.init()
@@ -67,6 +68,7 @@ def Menu(screen,Initiale):
             Game(screen)
             play = False
         if editor:
+            sleep(0.5)
             LevelEditor()
             editor = False
 
@@ -98,7 +100,7 @@ def Game(screen):
     player_frame = 0
     player_flip = False
 
-    player = Player("Cybonix", 20, 4, 3, 35)
+    player = Player("Cybonix", 20, 4, 3, 35, 75)
     player.setLocation(450, 600)
 
     true_scroll = [0, 0]
@@ -135,9 +137,9 @@ def Game(screen):
             if move_left:
                 player_movement[0] -= 4
             player_movement[1] += player_y_momentum
-            player_y_momentum += 0.8
-            if player_y_momentum > 3:
-                player_y_momentum = 3
+            player_y_momentum += 0.6
+            if player_y_momentum > 6:
+                player_y_momentum = 6
 
             if player_movement[0] > 0 and player_movement[1] == 0:
                 player_action, player_frame = animation.change_action(player_action, player_frame, 'walk')
@@ -205,7 +207,7 @@ def Game(screen):
                         move_left = True
                     if event.key == K_UP:
                         if air_timer < 6:
-                            player_y_momentum = -9
+                            player_y_momentum = -8
                     if event.key == K_ESCAPE:
                         pause = True
                 if event.type == KEYUP:

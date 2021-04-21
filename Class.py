@@ -1,6 +1,6 @@
 from time import sleep
 
-import pygame,csv
+import pygame, csv
 from math import *
 from pygame import *
 
@@ -47,7 +47,8 @@ class Map():
             x = 0
             for tile in row:
                 if tile != -1 and tile != 75:
-                    self.screen.blit(self.tile_img_list[int(tile)], (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
+                    self.screen.blit(self.tile_img_list[int(tile)],
+                                     (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
                 if tile != -1 and tile != 75:
                     self.tile_rects.append(
                         pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE))
@@ -86,7 +87,7 @@ class Animations():
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, pseudo, health, lives, attack, nbr_grenade):
+    def __init__(self, pseudo, health, lives, attack, nbr_grenade, nbr_ammo):
         super().__init__()
         self.player_img = pygame.image.load('Assets/Characters/Player/idle/idle_0.png')
         self.heart = pygame.image.load('Assets/life.gif')
@@ -94,12 +95,15 @@ class Player(pygame.sprite.Sprite):
         self.shoot_sound.set_volume(0.01)
         self.grenade_img = pygame.image.load('Assets/grenade/grenade_0.png')
         self.player_box = self.player_img.get_rect()
+        self.myFont = pygame.font.SysFont("Arial", 18)
+
         self.pseudo = pseudo
         self.health = health
         self.health_bar_under = pygame.Surface((20, 2))
         self.attack = attack
         self.lives = lives
         self.nbr_grenade = nbr_grenade
+        self.nbr_ammo = nbr_ammo
         self.weapon = None
         self.armor = 5
 
@@ -107,7 +111,7 @@ class Player(pygame.sprite.Sprite):
         self.player_box.y = y
         self.player_box.x = x
 
-    def move(self, movement, tile_rects,map,ennemis):
+    def move(self, movement, tile_rects, map, ennemis):
         self.movement = movement
         self.tiles = tile_rects
         self.collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
@@ -162,6 +166,9 @@ class Player(pygame.sprite.Sprite):
             display.blit(pygame.transform.scale(self.grenade_img, (108, 110)),
                          (self.heart.get_width() * i - 33 + i * 5, -5))
 
+        ammo_display = self.myFont.render(f"{self.nbr_ammo}", False, (255, 255, 255))
+        display.blit(ammo_display,(15,70))
+
         if self.health < 1:
             self.health = 20
             self.lives -= 1
@@ -180,10 +187,11 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self, display, direction):
         self.shoot_sound.play()
+        self.nbr_ammo -= 1
         if direction:
-            return BulletLeft(self.player_box.x - 25, self.player_box.y, self.attack, display)
+            return BulletLeft(self.player_box.x - 25, self.player_box.y, self.attack, display, True)
         else:
-            return BulletRight(self.player_box.x + 28, self.player_box.y, self.attack, display)
+            return BulletRight(self.player_box.x + 28, self.player_box.y, self.attack, display, True)
 
     def grenade(self, display, direction, v0):
         if direction:
@@ -191,7 +199,7 @@ class Player(pygame.sprite.Sprite):
             return GrenadeLeft(self.player_box.x - 60, self.player_box.y, display, v0)
         else:
             self.nbr_grenade -= 1
-            return GrenadeRight(self.player_box.x - 10, self.player_box.y+40, display, v0)
+            return GrenadeRight(self.player_box.x - 10, self.player_box.y + 40, display, v0)
 
     def get_pseudo(self):
         return self.pseudo
@@ -222,9 +230,10 @@ class Player(pygame.sprite.Sprite):
 
 
 class BulletRight(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, damage, display):
+    def __init__(self, pos_x, pos_y, damage, display, fromPlayer):
         super().__init__()
         self.display = display
+        self.fromPlayer = fromPlayer
         self.damage = damage
         self.image = pygame.Surface((5, 2))
         self.image.fill((255, 255, 0))
@@ -242,20 +251,22 @@ class BulletRight(pygame.sprite.Sprite):
             if self.rect.colliderect(tile):
                 self.kill()
 
-        for ennemi in ennemi_groupe.sprites():
-            if self.rect.colliderect(ennemi.ennemi_box):
-                ennemi.damage(self.damage)
-                self.kill()
+        if self.fromPlayer:
+            for ennemi in ennemi_groupe.sprites():
+                if self.rect.colliderect(ennemi.ennemi_box):
+                    ennemi.damage(self.damage)
+                    self.kill()
         if self.rect.colliderect(player.player_box):
             player.damage(self.damage)
             self.kill()
 
 
 class BulletLeft(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, damage, display):
+    def __init__(self, pos_x, pos_y, damage, display, fromPlayer):
         super().__init__()
         self.damage = damage
         self.display = display
+        self.fromPlayer = fromPlayer
         self.image = pygame.Surface((5, 2))
         self.image.fill((255, 255, 0))
         self.rect = self.image.get_rect(center=(pos_x + 15, pos_y + 24))
@@ -272,10 +283,12 @@ class BulletLeft(pygame.sprite.Sprite):
             if self.rect.colliderect(tile):
                 self.kill()
 
-        for ennemi in ennemi_groupe.sprites():
-            if self.rect.colliderect(ennemi.ennemi_box):
-                ennemi.damage(self.damage)
-                self.kill()
+        if self.fromPlayer:
+            for ennemi in ennemi_groupe.sprites():
+                if self.rect.colliderect(ennemi.ennemi_box):
+                    ennemi.damage(self.damage)
+                    self.kill()
+
         if self.rect.colliderect(player.player_box):
             player.damage(self.damage)
             self.kill()
@@ -314,7 +327,6 @@ class GrenadeRight(pygame.sprite.Sprite):
                 if not self.hit:
                     self.explosion_sound.play()
                 self.hit = True
-
 
         if self.hit:
             self.animation_frame += 1
@@ -386,6 +398,7 @@ class Ennemi(pygame.sprite.Sprite):
         self.cpt = 0
         self.shootCooldown = 0
         self.direction = -1
+        self.findPlayer = False
         self.ennemi_momentum = 0
         self.shoot_sound = pygame.mixer.Sound('Assets/Sounds/tir.wav')
         self.shoot_sound.set_volume(0.01)
@@ -393,9 +406,9 @@ class Ennemi(pygame.sprite.Sprite):
     def shoot(self, display, direction):
 
         if direction:
-            return BulletLeft(self.ennemi_box.x - 30, self.ennemi_box.y - 7, self.attack, display)
+            return BulletLeft(self.ennemi_box.x - 30, self.ennemi_box.y - 7, self.attack, display, False)
         else:
-            return BulletRight(self.ennemi_box.x + 30, self.ennemi_box.y - 7, self.attack, display)
+            return BulletRight(self.ennemi_box.x + 30, self.ennemi_box.y - 7, self.attack, display, False)
 
     def get_attack_value(self):
         return self.attack
@@ -404,42 +417,46 @@ class Ennemi(pygame.sprite.Sprite):
         display.blit(self.ennemi_img, (self.ennemi_box.x - scroll[0], self.ennemi_box.y - scroll[1]))
         if self.health < 1:
             self.kill()
-        self.tiles = tile_rects
-        if self.cpt > 140:
-            self.cpt = 0
-            self.direction *= -1
-        if self.direction == -1:
-            self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'), True, False)
-            self.ennemi_box.x -= 1
-        if self.direction == 1:
-            self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'), False, False)
-            self.ennemi_box.x += 1
-        self.cpt += 1
 
-        hit_list = []
-        for tile in self.tiles:
-            if self.ennemi_box.colliderect(tile):
-                hit_list.append(tile)
-
-        for tile in hit_list:
+        if not self.findPlayer:
+            self.tiles = tile_rects
+            if self.cpt > 40:
+                self.cpt = 0
+                self.direction *= -1
+            if self.direction == -1:
+                self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'),
+                                                        True, False)
+                self.ennemi_box.x -= 1
             if self.direction == 1:
-                self.ennemi_box.right = tile.left
-            elif self.direction == -1:
-                self.ennemi_box.left = tile.right
+                self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'),
+                                                        False, False)
+                self.ennemi_box.x += 1
+            self.cpt += 1
 
-        self.ennemi_momentum += 0.6
-        if self.ennemi_momentum > 3:
-            self.ennemi_momentum = 3
+            hit_list = []
+            for tile in self.tiles:
+                if self.ennemi_box.colliderect(tile):
+                    hit_list.append(tile)
 
-        self.ennemi_box.y += self.ennemi_momentum
-        hit_list = []
-        for tile in self.tiles:
-            if self.ennemi_box.colliderect(tile):
-                hit_list.append(tile)
+            for tile in hit_list:
+                if self.direction == 1:
+                    self.ennemi_box.right = tile.left
+                elif self.direction == -1:
+                    self.ennemi_box.left = tile.right
 
-        for tile in hit_list:
-            self.ennemi_box.bottom = tile.top
-            self.ennemi_momentum = 0
+            self.ennemi_momentum += 0.6
+            if self.ennemi_momentum > 6:
+                self.ennemi_momentum = 6
+
+            self.ennemi_box.y += self.ennemi_momentum
+            hit_list = []
+            for tile in self.tiles:
+                if self.ennemi_box.colliderect(tile):
+                    hit_list.append(tile)
+
+            for tile in hit_list:
+                self.ennemi_box.bottom = tile.top
+                self.ennemi_momentum = 0
 
         self.health_bar_under.fill((220, 220, 220))
         display.blit(self.health_bar_under, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
@@ -449,17 +466,29 @@ class Ennemi(pygame.sprite.Sprite):
             self.health_bar.fill((255, 0, 0))
             display.blit(self.health_bar, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
 
-        if 400 > self.ennemi_box.x - player.player_box.x > 0:
+        if 450 > self.ennemi_box.x - player.player_box.x > 0 and player.player_box.y == self.ennemi_box.y:
+            self.findPlayer = True
+            self.direction = -1
+            self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'),
+                                                    True, False)
             if self.shootCooldown == 0:
                 self.shoot_sound.play()
                 bullet_groupe.add(self.shoot(display, True))
                 self.shootCooldown = 50
 
-        if 0 > self.ennemi_box.x - player.player_box.x > -400:
+        elif 0 > self.ennemi_box.x - player.player_box.x > -450 and player.player_box.y == self.ennemi_box.y:
+            self.findPlayer = True
+            self.direction = 1
+            self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'),
+                                                    False,
+                                                    False)
             if self.shootCooldown == 0:
                 self.shoot_sound.play()
                 bullet_groupe.add(self.shoot(display, False))
                 self.shootCooldown = 50
+        else:
+            self.findPlayer = False
+
         if self.shootCooldown > 0:
             self.shootCooldown -= 1
 
