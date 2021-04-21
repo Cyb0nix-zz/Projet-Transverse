@@ -83,7 +83,7 @@ def Menu(screen,Initiale):
 def Game(screen):
     display = pygame.Surface((1280, 704))
 
-    map = Map(1, display, TILE_SIZE)
+    map = Map(0, display, TILE_SIZE)
 
     animation = Animations()
 
