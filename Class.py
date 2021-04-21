@@ -2,6 +2,7 @@ from time import sleep
 
 import pygame, csv
 from math import *
+from random import*
 from pygame import *
 
 
@@ -33,7 +34,9 @@ class Map():
             x = 0
             for tile in row:
                 if tile == 75:
-                    ennemi_groupe.add(Ennemi(20, 2, x * self.TILE_SIZE, y * self.TILE_SIZE))
+                    ennemi_groupe.add(Ennemi(20, 2, x * self.TILE_SIZE, y * self.TILE_SIZE, False))
+                if tile == 76:
+                    ennemi_groupe.add(Ennemi(20, 2, x * self.TILE_SIZE, y * self.TILE_SIZE, True))
                 x += 1
             y += 1
         return ennemi_groupe
@@ -46,10 +49,10 @@ class Map():
         for row in self.world_data:
             x = 0
             for tile in row:
-                if tile != -1 and tile != 75:
+                if tile != -1 and tile < 75:
                     self.screen.blit(self.tile_img_list[int(tile)],
                                      (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
-                if tile != -1 and tile != 75:
+                if tile != -1 and tile < 75:
                     self.tile_rects.append(
                         pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE))
                 x += 1
@@ -386,16 +389,20 @@ class GrenadeLeft(pygame.sprite.Sprite):
 
 
 class Ennemi(pygame.sprite.Sprite):
-    def __init__(self, health, attack, pos_x, pos_y):
+    def __init__(self, health, attack, pos_x, pos_y, static):
         super().__init__()
         self.ennemi_img = pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png')
         self.ennemi_box = self.ennemi_img.get_rect()
         self.ennemi_box.x = pos_x
         self.ennemi_box.y = pos_y
         self.animation = Animations()
+        self.static = static
         self.animation_database = {}
         self.animation_database['walk'] = self.animation.load_animation('Assets/Characters/Ennemi/walk', [5, 5, 5, 5, 5, 5])
-        self.animation_database['idle'] = self.animation.load_animation('Assets/Characters/Ennemi/idle', [7, 7])
+        if static:
+            self.animation_database['idle'] = self.animation.load_animation('Assets/Characters/Ennemi_2/idle', [7, 7])
+        else:
+            self.animation_database['idle'] = self.animation.load_animation('Assets/Characters/Ennemi/idle', [7, 7])
         self.ennemi_action = 'idle'
         self.ennemi_frame = 0
         self.health = health
@@ -455,10 +462,10 @@ class Ennemi(pygame.sprite.Sprite):
         else:
             self.findPlayer = False
 
-        if not self.findPlayer:
+        if not self.findPlayer and not self.static:
             self.ennemi_action, self.ennemi_frame = self.animation.change_action(self.ennemi_action, self.ennemi_frame, 'walk')
             self.tiles = tile_rects
-            if self.cpt > 40:
+            if self.cpt > randint(10, 140):
                 self.cpt = 0
                 self.direction *= -1
             if self.direction == -1:

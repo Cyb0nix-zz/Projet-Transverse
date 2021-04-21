@@ -308,7 +308,7 @@ def LevelEditor():
     ROWS = 29
     MAX_COLS = 312
     TILE_SIZE = 32
-    TILE_TYPES = 76
+    TILE_TYPES = 77
     level = 0
     scroll_left = False
     scroll_right = False
@@ -327,7 +327,7 @@ def LevelEditor():
     # Créer les différentes tile
     img_list = []
     for x in range(TILE_TYPES):
-        if x== 75:
+        if x == 75 or x == 76:
             img = pygame.image.load(f'Assets/Tiles/{x}.png').convert_alpha()
             img_list.append(img)
         else:
