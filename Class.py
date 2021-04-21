@@ -311,8 +311,10 @@ class GrenadeRight(pygame.sprite.Sprite):
 
         for tile in tiles:
             if self.rect.colliderect(tile):
+                if not self.hit:
+                    self.explosion_sound.play()
                 self.hit = True
-                self.explosion_sound.play()
+
 
         if self.hit:
             self.animation_frame += 1
@@ -355,8 +357,10 @@ class GrenadeLeft(pygame.sprite.Sprite):
 
         for tile in tiles:
             if self.rect.colliderect(tile):
+                if not self.hit:
+                    self.explosion_sound.play()
                 self.hit = True
-                self.explosion_sound.play()
+
         if self.hit:
             self.animation_frame += 1
             if self.animation_frame < len(self.animation_list):
