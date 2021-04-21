@@ -1,31 +1,38 @@
-import pygame
+import pygame,csv
 from math import *
 from pygame import *
 
 
 class Map():
-    def __init__(self, path, screen, TILE_SIZE):
+    def __init__(self, level, screen, TILE_SIZE):
         self.TILE_SIZE = TILE_SIZE
+        self.TILE_TYPES = 75
         self.screen = screen
-        self.path = path
-        self.background = pygame.image.load('LevelEditor/bg/0.png')
-        self.wall_block = pygame.image.load('textures/wall_building.png')
-        self.windows_block = pygame.image.load('textures/building_night_light_on.png')
+        self.background = pygame.image.load('Assets/bg/0.png')
+        self.tile_img_list = []
+        for x in range(self.TILE_TYPES):
+            img = pygame.image.load(f'Assets/Tiles/{x}.png').convert_alpha()
+            img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+            self.tile_img_list.append(img)
 
-        f = open(path + '.txt', 'r')
-        data = f.read()
-        f.close()
-        data = data.split('\n')
-        self.game_map = []
-        for row in data:
-            self.game_map.append(list(row))
+        self.world_data = []
+        for row in range(29):
+            r = [-1] * 312
+            self.world_data.append(r)
+        with open(f'Levels/level{level}_data.txt', newline='') as txtfile:
+            reader = csv.reader(txtfile, delimiter=',')
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    self.world_data[x][y] = int(tile)
+
+        print(self.world_data)
 
     def set_mobs(self, ennemi_groupe):
         y = 0
-        for row in self.game_map:
+        for row in self.world_data:
             x = 0
             for tile in row:
-                if tile == '5':
+                if tile == '75':
                     ennemi_groupe.add(Ennemi(20, 2, x * self.TILE_SIZE, y * self.TILE_SIZE))
                 x += 1
             y += 1
@@ -36,15 +43,12 @@ class Map():
         self.screen.blit(self.background, (0 - scroll[0] * 0.15, -200 - scroll[1] * 0.15))
         self.tile_rects = []
         y = 0
-        for row in self.game_map:
+        for row in self.world_data:
             x = 0
             for tile in row:
-                if tile == '1':
-                    self.screen.blit(self.wall_block, (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
-                if tile == '2':
-                    self.screen.blit(self.windows_block,
-                                     (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
-                if tile != '0' and tile != '5':
+                if tile != -1 and tile != 75:
+                    self.screen.blit(self.tile_img_list[int(tile)], (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
+                if tile != -1 and tile != 75:
                     self.tile_rects.append(
                         pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE))
                 x += 1
@@ -84,7 +88,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, pseudo, health, lives, attack, nbr_grenade):
         super().__init__()
-        self.player_img = pygame.image.load('Characters/Player/idle/idle_0.png')
+        self.player_img = pygame.image.load('Assets/Characters/Player/idle/idle_0.png')
         self.heart = pygame.image.load('Assets/life.gif')
         self.shoot_sound = pygame.mixer.Sound('Assets/Sounds/tir.wav')
         self.shoot_sound.set_volume(0.01)
@@ -363,7 +367,7 @@ class GrenadeLeft(pygame.sprite.Sprite):
 class Ennemi(pygame.sprite.Sprite):
     def __init__(self, health, attack, pos_x, pos_y):
         super().__init__()
-        self.ennemi_img = pygame.image.load('Characters/Ennemi/idle/idle_0.png')
+        self.ennemi_img = pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png')
         self.ennemi_box = self.ennemi_img.get_rect()
         self.ennemi_box.x = pos_x
         self.ennemi_box.y = pos_y
@@ -396,10 +400,10 @@ class Ennemi(pygame.sprite.Sprite):
             self.cpt = 0
             self.direction *= -1
         if self.direction == -1:
-            self.ennemi_img = pygame.transform.flip(pygame.image.load('Characters/Ennemi/idle/idle_0.png'), True, False)
+            self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'), True, False)
             self.ennemi_box.x -= 1
         if self.direction == 1:
-            self.ennemi_img = pygame.transform.flip(pygame.image.load('Characters/Ennemi/idle/idle_0.png'), False, False)
+            self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'), False, False)
             self.ennemi_box.x += 1
         self.cpt += 1
 

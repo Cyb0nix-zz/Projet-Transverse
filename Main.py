@@ -18,11 +18,12 @@ pygame.font.init()
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("The Shadow of the past")
 
-def Menu(screen):
-    screen = pygame.display.set_mode(WINDOW_SIZE)
-    pygame.display.set_caption("The Shadow of the past")
-    pygame.display.update()
-    pygame.font.init()
+def Menu(screen,Initiale):
+    if not Initiale:
+        screen = pygame.display.set_mode(WINDOW_SIZE)
+        pygame.display.set_caption("The Shadow of the past")
+        pygame.display.update()
+        pygame.font.init()
     # Chargement et collage du fond
     display = pygame.Surface((1280, 720))
     fond = pygame.image.load('Assets/Menu/bg_menu.png')
@@ -82,16 +83,16 @@ def Menu(screen):
 def Game(screen):
     display = pygame.Surface((1280, 704))
 
-    map = Map("map", display, TILE_SIZE)
+    map = Map(1, display, TILE_SIZE)
 
     animation = Animations()
 
     animation_database = {}
 
-    animation_database['walk'] = animation.load_animation('Characters/Player/walk', [5, 5, 5, 5, 5, 5])
-    animation_database['idle'] = animation.load_animation('Characters/Player/idle', [7, 7])
-    animation_database['jump'] = animation.load_animation('Characters/Player/jump', [7, 7, 7, 7])
-    animation_database['jumpold'] = animation.load_animation('Characters/Player/jumpold', [7, 7, 7, 7, 7])
+    animation_database['walk'] = animation.load_animation('Assets/Characters/Player/walk', [5, 5, 5, 5, 5, 5])
+    animation_database['idle'] = animation.load_animation('Assets/Characters/Player/idle', [7, 7])
+    animation_database['jump'] = animation.load_animation('Assets/Characters/Player/jump', [7, 7, 7, 7])
+    animation_database['jumpold'] = animation.load_animation('Assets/Characters/Player/jumpold', [7, 7, 7, 7, 7])
 
     player_action = 'idle'
     player_frame = 0
@@ -241,7 +242,7 @@ def Game(screen):
             if menu:
                 menu = False
                 sleep(0.1)
-                Menu(screen)
+                Menu(screen,False)
 
 
             for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
@@ -276,7 +277,7 @@ def Game(screen):
             if menu:
                 menu = False
                 sleep(0.1)
-                Menu(screen)
+                Menu(screen,False)
 
 
             for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
@@ -318,26 +319,26 @@ def LevelEditor():
     pygame.display.set_caption("The Shadow of the past Level Editor")
 
     # Background
-    bg_0 = pygame.image.load('LevelEditor/bg/0.png').convert_alpha()
+    bg_0 = pygame.image.load('Assets/bg/0.png').convert_alpha()
     bg = bg_0.convert_alpha()
 
     # Créer les différentes tile
     img_list = []
     for x in range(TILE_TYPES):
         if x== 75:
-            img = pygame.image.load(f'LevelEditor/32x32/{x}.png').convert_alpha()
+            img = pygame.image.load(f'Assets/Tiles/{x}.png').convert_alpha()
             img_list.append(img)
         else:
-            img = pygame.image.load(f'LevelEditor/32x32/{x}.png').convert_alpha()
+            img = pygame.image.load(f'Assets/Tiles/{x}.png').convert_alpha()
             img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
             img_list.append(img)
 
     # Boutton pour sauvegarder et charger les niveaux
-    save_btn = pygame.image.load('LevelEditor/save_btn.png').convert_alpha()
-    load_btn = pygame.image.load('LevelEditor/load_btn.png').convert_alpha()
-    grid_btn = pygame.image.load('LevelEditor/grid_btn.png').convert_alpha()
-    hide_btn = pygame.image.load('LevelEditor/hide_btn.png').convert_alpha()
-    trash_btn = pygame.image.load('LevelEditor/trash.png').convert_alpha()
+    save_btn = pygame.image.load('Assets/LevelEditor/save_btn.png').convert_alpha()
+    load_btn = pygame.image.load('Assets/LevelEditor/load_btn.png').convert_alpha()
+    grid_btn = pygame.image.load('Assets/LevelEditor/grid_btn.png').convert_alpha()
+    hide_btn = pygame.image.load('Assets/LevelEditor/hide_btn.png').convert_alpha()
+    trash_btn = pygame.image.load('Assets/LevelEditor/trash.png').convert_alpha()
 
     # Couleurs
     BLACK = (0, 0, 0)
@@ -380,7 +381,7 @@ def LevelEditor():
             msgbox = messagebox.askquestion('Delete level ', 'Voulez-vous vraiment supprimer le niveau ? ',
                                             icon="warning")
             if msgbox == 'yes':
-                os.remove(f'LevelEditor/level{level}_data.txt')
+                os.remove(f'Levels/level{level}_data.txt')
             else:
                 pass
         except FileNotFoundError:
@@ -426,14 +427,14 @@ def LevelEditor():
         if trash_button.draw(display):
             del_function(level)
         if save_button.draw(display):
-            with open(f'LevelEditor/level{level}_data.txt', 'w', newline='') as txtfile:
+            with open(f'Levels/level{level}_data.txt', 'w', newline='') as txtfile:
                 writer = csv.writer(txtfile, delimiter=',')
                 for row in world_data:
                     writer.writerow(row)
         if load_button.draw(display):
             scroll = 0
             try:
-                with open(f'LevelEditor/level{level}_data.txt', newline='') as txtfile:
+                with open(f'Levels/level{level}_data.txt', newline='') as txtfile:
                     reader = csv.reader(txtfile, delimiter=',')
                     for x, row in enumerate(reader):
                         for y, tile in enumerate(row):
@@ -480,7 +481,7 @@ def LevelEditor():
                     scroll_speed = 5
                 if event.key == K_ESCAPE:
                     Run = False
-                    Menu(screen)
+                    Menu(screen,False)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     scroll_left = False
@@ -492,4 +493,4 @@ def LevelEditor():
 
     pygame.quit()
 
-Menu(screen)
+Menu(screen,True)
