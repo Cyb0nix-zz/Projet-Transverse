@@ -72,12 +72,15 @@ def Menu(screen,Initiale):
 
         for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
             if event.type == QUIT:  # Si un de ces événements est de type QUIT
-                continuer = False  # On arrête la boucle
+                pygame.quit()
 
         surf = pygame.transform.scale(display, WINDOW_SIZE)
+
         pygame.display.update()
         screen.blit(surf, (0, 0))
         clock.tick(FPS)
+
+
 
 
 def Game(screen):
@@ -98,7 +101,7 @@ def Game(screen):
     player_frame = 0
     player_flip = False
 
-    player = Player("Cybonix", 20, 4, 3, 35, 75)
+    player = Player("Cybonix", 20, 3, 3, 3, 75)
     player.setLocation(450, 600)
 
     true_scroll = [0, 0]
@@ -109,7 +112,7 @@ def Game(screen):
     launch_grenade = False
     air_timer = 0
     ennemi_groupe = pygame.sprite.Group()
-    ennemi_groupe = map.set_mobs(ennemi_groupe)
+    #ennemi_groupe = map.set_mobs(ennemi_groupe)
     bullet_groupe = pygame.sprite.Group()
     grenade_groupe = pygame.sprite.Group()
     run = True
@@ -126,7 +129,7 @@ def Game(screen):
             scroll[0] = int(scroll[0])
             scroll[1] = int(scroll[1])
 
-            tile_rects = map.update(scroll)
+            tile_rects,end = map.update(scroll)
 
             player_movement = [0, 0]
 
@@ -158,7 +161,7 @@ def Game(screen):
             if player_movement[1] < 0 and player_movement[0] > 0:
                 player_action, player_frame = animation.change_action(player_action, player_frame, 'jump')
 
-            player.move(player_movement, tile_rects,map,ennemi_groupe)
+            player.move(player_movement, tile_rects,map,ennemi_groupe,end)
             if player.collision_types['bottom']:
                 player_y_momentum = 0
                 air_timer = 0
@@ -288,6 +291,32 @@ def Game(screen):
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         pause = False
+        if player.win:
+            fond = pygame.image.load('Assets/Menu/bg_menu.png')
+            display.blit(fond, (-2, 0))
+            title_font = pygame.font.Font('Assets/Menu/Wargate.ttf', 85)
+            button_font = pygame.font.Font('Assets/Menu/Cold_Warm.otf', 40)
+
+            title = title_font.render("You Win !", False, (243, 233, 210))
+            display.blit(title, (460, 150))
+
+            img_menu = pygame.Surface((270, 60))
+            img_menu.fill((26, 126, 95))
+            txt_menu = button_font.render("Menu", False, (243, 233, 210))
+            img_menu.blit(txt_menu, (85, 10))
+            menu_button = Button(500, 400, img_menu, 1)
+
+            menu = menu_button.draw(display)
+            if play:
+                pause = False
+            if menu:
+                menu = False
+                sleep(0.5)
+                Menu(screen, False)
+
+            for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
+                if event.type == QUIT:  # Si un de ces événements est de type QUIT
+                    pygame.quit()# On arrête la boucle
 
         surf = pygame.transform.scale(display, WINDOW_SIZE)
         pygame.display.update()
@@ -471,7 +500,7 @@ def LevelEditor():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                Run = False
+                pygame.quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     level += 1
@@ -493,8 +522,11 @@ def LevelEditor():
                     scroll_right = False
                 if event.key == pygame.K_LSHIFT:
                     scroll_speed = 1
-        pygame.display.update()
+        try:
+            pygame.display.update()
+        except pygame.error:
+            pass
 
-    pygame.quit()
+
 
 Menu(screen,True)

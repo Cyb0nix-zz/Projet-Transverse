@@ -45,6 +45,7 @@ class Map():
         self.screen.fill((146, 244, 255))
         self.screen.blit(self.background, (0 - scroll[0] * 0.15, -200 - scroll[1] * 0.15))
         self.tile_rects = []
+        self.end = []
         y = 0
         for row in self.world_data:
             x = 0
@@ -52,13 +53,15 @@ class Map():
                 if tile != -1 and tile < 75:
                     self.screen.blit(self.tile_img_list[int(tile)],
                                      (x * self.TILE_SIZE - scroll[0], y * self.TILE_SIZE - scroll[1]))
-                if tile != -1 and tile < 75:
+                if tile != -1 and tile != 22 and tile < 75:
                     self.tile_rects.append(
                         pygame.Rect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE))
+                if tile == 22:
+                    self.end.append(pygame.Rect(x*self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE))
                 x += 1
             y += 1
 
-        return self.tile_rects
+        return self.tile_rects, self.end
 
 
 class Animations():
@@ -98,7 +101,7 @@ class Player(pygame.sprite.Sprite):
         self.shoot_sound.set_volume(0.01)
         self.grenade_img = pygame.image.load('Assets/grenade/grenade_0.png')
         self.player_box = self.player_img.get_rect()
-        self.myFont = pygame.font.SysFont("Arial", 18)
+        self.myFont = pygame.font.SysFont("Arial", 14)
         self.pseudo = pseudo
         self.health = health
         self.health_bar_under = pygame.Surface((20, 2))
@@ -108,12 +111,13 @@ class Player(pygame.sprite.Sprite):
         self.nbr_ammo = nbr_ammo
         self.weapon = None
         self.armor = 5
+        self.win = False
 
     def setLocation(self, x, y):
         self.player_box.y = y
         self.player_box.x = x
 
-    def move(self, movement, tile_rects, map, ennemis):
+    def move(self, movement, tile_rects, map, ennemis, end):
         self.movement = movement
         self.tiles = tile_rects
         self.collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
@@ -150,6 +154,10 @@ class Player(pygame.sprite.Sprite):
             elif self.movement[1] < 0:
                 self.player_box.top = tile.bottom
                 self.collision_types['top'] = True
+
+        for bloc in end:
+            if self.player_box.colliderect(bloc):
+                self.win = True
 
         if self.player_box.y > 900:
             sleep(0.5)
@@ -409,6 +417,7 @@ class Ennemi(pygame.sprite.Sprite):
         self.health_bar_under = pygame.Surface((20, 2))
         self.attack = attack
         self.cpt = 0
+        self.walk_distance = randint(50, 180)
         self.shootCooldown = 0
         self.direction = -1
         self.findPlayer = False
@@ -433,12 +442,12 @@ class Ennemi(pygame.sprite.Sprite):
         if self.health < 1:
             self.kill()
         self.health_bar_under.fill((220, 220, 220))
-        display.blit(self.health_bar_under, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
+        display.blit(self.health_bar_under, (self.ennemi_box.x +10 - scroll[0], self.ennemi_box.y - scroll[1]))
 
         if self.health > 0:
             self.health_bar = pygame.Surface((self.health, 2))
             self.health_bar.fill((255, 0, 0))
-            display.blit(self.health_bar, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
+            display.blit(self.health_bar, (self.ennemi_box.x + 10 - scroll[0], self.ennemi_box.y - scroll[1]))
 
         if 450 > self.ennemi_box.x - player.player_box.x > 0 and player.player_box.y == self.ennemi_box.y:
             self.ennemi_action, self.ennemi_frame = self.animation.change_action(self.ennemi_action, self.ennemi_frame,
@@ -465,7 +474,7 @@ class Ennemi(pygame.sprite.Sprite):
         if not self.findPlayer and not self.static:
             self.ennemi_action, self.ennemi_frame = self.animation.change_action(self.ennemi_action, self.ennemi_frame, 'walk')
             self.tiles = tile_rects
-            if self.cpt > randint(10, 140):
+            if self.cpt > self.walk_distance:
                 self.cpt = 0
                 self.direction *= -1
             if self.direction == -1:
