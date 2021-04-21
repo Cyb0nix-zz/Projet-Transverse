@@ -305,7 +305,7 @@ def LevelEditor():
     ROWS = 29
     MAX_COLS = 312
     TILE_SIZE = 32
-    TILE_TYPES = 75
+    TILE_TYPES = 76
     level = 0
     scroll_left = False
     scroll_right = False
@@ -324,9 +324,13 @@ def LevelEditor():
     # Créer les différentes tile
     img_list = []
     for x in range(TILE_TYPES):
-        img = pygame.image.load(f'LevelEditor/32x32/{x}.png').convert_alpha()
-        img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
-        img_list.append(img)
+        if x== 75:
+            img = pygame.image.load(f'LevelEditor/32x32/{x}.png').convert_alpha()
+            img_list.append(img)
+        else:
+            img = pygame.image.load(f'LevelEditor/32x32/{x}.png').convert_alpha()
+            img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+            img_list.append(img)
 
     # Boutton pour sauvegarder et charger les niveaux
     save_btn = pygame.image.load('LevelEditor/save_btn.png').convert_alpha()
