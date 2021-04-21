@@ -99,7 +99,7 @@ def Game(screen):
     player_flip = False
 
     player = Player("Cybonix", 20, 4, 3, 3)
-    player.setLocation(400, 540)
+    player.setLocation(450, 600)
 
     true_scroll = [0, 0]
     move_right = False
@@ -225,13 +225,13 @@ def Game(screen):
             img_replay = pygame.Surface((270, 60))
             img_replay.fill((26, 126, 95))
             txt_replay = button_font.render("Replay", False, (243, 233, 210))
-            img_replay.blit(txt_replay, (90, 10))
+            img_replay.blit(txt_replay, (60, 10))
             replay_button = Button(500, 320, img_replay, 1)
 
             img_menu = pygame.Surface((270, 60))
             img_menu.fill((26, 126, 95))
             txt_menu = button_font.render("Menu", False, (243, 233, 210))
-            img_menu.blit(txt_menu, (105, 10))
+            img_menu.blit(txt_menu, (75, 10))
             menu_button = Button(500, 400, img_menu, 1)
 
             replay = replay_button.draw(display)

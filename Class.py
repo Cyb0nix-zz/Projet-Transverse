@@ -1,3 +1,5 @@
+from time import sleep
+
 import pygame,csv
 from math import *
 from pygame import *
@@ -142,6 +144,12 @@ class Player(pygame.sprite.Sprite):
             elif self.movement[1] < 0:
                 self.player_box.top = tile.bottom
                 self.collision_types['top'] = True
+
+        if self.player_box.y > 800:
+            sleep(0.5)
+            self.lives -= 1
+            self.player_box.x = 450
+            self.player_box.y = 600
 
     def update(self, player_img, display, scroll):
         display.blit(player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
