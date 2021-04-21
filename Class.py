@@ -25,8 +25,6 @@ class Map():
                 for y, tile in enumerate(row):
                     self.world_data[x][y] = int(tile)
 
-        print(self.world_data)
-
     def set_mobs(self, ennemi_groupe):
         y = 0
         for row in self.world_data:
