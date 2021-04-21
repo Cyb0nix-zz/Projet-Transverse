@@ -145,7 +145,7 @@ class Player(pygame.sprite.Sprite):
                 self.player_box.top = tile.bottom
                 self.collision_types['top'] = True
 
-        if self.player_box.y > 800:
+        if self.player_box.y > 900:
             sleep(0.5)
             self.lives -= 1
             self.player_box.x = 450
