@@ -137,7 +137,9 @@ def Game(screen):
             if move_left:
                 player_movement[0] -= 4
             player_movement[1] += player_y_momentum
+
             player_y_momentum += 0.6
+            
             if player_y_momentum > 6:
                 player_y_momentum = 6
 
