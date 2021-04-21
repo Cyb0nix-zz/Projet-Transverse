@@ -10,8 +10,6 @@ WINDOW_SIZE = (1280, 720)
 TILE_SIZE = 32
 FPS = 60
 
-
-
 clock = pygame.time.Clock()
 pygame.init()
 pygame.font.init()
@@ -85,7 +83,7 @@ def Menu(screen,Initiale):
 def Game(screen):
     display = pygame.Surface((1280, 704))
 
-    map = Map(0, display, TILE_SIZE)
+    map = Map(1, display, TILE_SIZE)
 
     animation = Animations()
 

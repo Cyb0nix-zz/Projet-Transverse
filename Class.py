@@ -96,7 +96,6 @@ class Player(pygame.sprite.Sprite):
         self.grenade_img = pygame.image.load('Assets/grenade/grenade_0.png')
         self.player_box = self.player_img.get_rect()
         self.myFont = pygame.font.SysFont("Arial", 18)
-
         self.pseudo = pseudo
         self.health = health
         self.health_bar_under = pygame.Surface((20, 2))
@@ -256,7 +255,7 @@ class BulletRight(pygame.sprite.Sprite):
                 if self.rect.colliderect(ennemi.ennemi_box):
                     ennemi.damage(self.damage)
                     self.kill()
-                    
+
         if self.rect.colliderect(player.player_box):
             player.damage(self.damage)
             self.kill()
@@ -393,6 +392,12 @@ class Ennemi(pygame.sprite.Sprite):
         self.ennemi_box = self.ennemi_img.get_rect()
         self.ennemi_box.x = pos_x
         self.ennemi_box.y = pos_y
+        self.animation = Animations()
+        self.animation_database = {}
+        self.animation_database['walk'] = self.animation.load_animation('Assets/Characters/Ennemi/walk', [5, 5, 5, 5, 5, 5])
+        self.animation_database['idle'] = self.animation.load_animation('Assets/Characters/Ennemi/idle', [7, 7])
+        self.ennemi_action = 'idle'
+        self.ennemi_frame = 0
         self.health = health
         self.health_bar_under = pygame.Surface((20, 2))
         self.attack = attack
@@ -415,22 +420,50 @@ class Ennemi(pygame.sprite.Sprite):
         return self.attack
 
     def update(self, display, scroll, tile_rects, player, bullet_groupe):
+
         display.blit(self.ennemi_img, (self.ennemi_box.x - scroll[0], self.ennemi_box.y - scroll[1]))
+
         if self.health < 1:
             self.kill()
+        self.health_bar_under.fill((220, 220, 220))
+        display.blit(self.health_bar_under, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
+
+        if self.health > 0:
+            self.health_bar = pygame.Surface((self.health, 2))
+            self.health_bar.fill((255, 0, 0))
+            display.blit(self.health_bar, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
+
+        if 450 > self.ennemi_box.x - player.player_box.x > 0 and player.player_box.y == self.ennemi_box.y:
+            self.ennemi_action, self.ennemi_frame = self.animation.change_action(self.ennemi_action, self.ennemi_frame,
+                                                                                 'idle')
+            self.findPlayer = True
+            self.direction = -1
+            if self.shootCooldown == 0:
+                self.shoot_sound.play()
+                bullet_groupe.add(self.shoot(display, True))
+                self.shootCooldown = 50
+
+        elif 0 > self.ennemi_box.x - player.player_box.x > -450 and player.player_box.y == self.ennemi_box.y:
+            self.ennemi_action, self.ennemi_frame = self.animation.change_action(self.ennemi_action, self.ennemi_frame,
+                                                                                 'idle')
+            self.findPlayer = True
+            self.direction = 1
+            if self.shootCooldown == 0:
+                self.shoot_sound.play()
+                bullet_groupe.add(self.shoot(display, False))
+                self.shootCooldown = 50
+        else:
+            self.findPlayer = False
 
         if not self.findPlayer:
+            self.ennemi_action, self.ennemi_frame = self.animation.change_action(self.ennemi_action, self.ennemi_frame, 'walk')
             self.tiles = tile_rects
             if self.cpt > 40:
                 self.cpt = 0
                 self.direction *= -1
             if self.direction == -1:
-                self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'),
-                                                        True, False)
                 self.ennemi_box.x -= 1
             if self.direction == 1:
-                self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'),
-                                                        False, False)
                 self.ennemi_box.x += 1
             self.cpt += 1
 
@@ -459,36 +492,16 @@ class Ennemi(pygame.sprite.Sprite):
                 self.ennemi_box.bottom = tile.top
                 self.ennemi_momentum = 0
 
-        self.health_bar_under.fill((220, 220, 220))
-        display.blit(self.health_bar_under, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
+        ennemi_image_id = self.animation_database[self.ennemi_action][self.ennemi_frame]
 
-        if self.health > 0:
-            self.health_bar = pygame.Surface((self.health, 2))
-            self.health_bar.fill((255, 0, 0))
-            display.blit(self.health_bar, (self.ennemi_box.x + 20 - scroll[0], self.ennemi_box.y - scroll[1]))
+        if self.direction == -1:
+            self.ennemi_img = pygame.transform.flip(self.animation.animation_frames[ennemi_image_id],True,False)
+        if self.direction == 1:
+            self.ennemi_img = pygame.transform.flip(self.animation.animation_frames[ennemi_image_id],False,False)
 
-        if 450 > self.ennemi_box.x - player.player_box.x > 0 and player.player_box.y == self.ennemi_box.y:
-            self.findPlayer = True
-            self.direction = -1
-            self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'),
-                                                    True, False)
-            if self.shootCooldown == 0:
-                self.shoot_sound.play()
-                bullet_groupe.add(self.shoot(display, True))
-                self.shootCooldown = 50
-
-        elif 0 > self.ennemi_box.x - player.player_box.x > -450 and player.player_box.y == self.ennemi_box.y:
-            self.findPlayer = True
-            self.direction = 1
-            self.ennemi_img = pygame.transform.flip(pygame.image.load('Assets/Characters/Ennemi/idle/idle_0.png'),
-                                                    False,
-                                                    False)
-            if self.shootCooldown == 0:
-                self.shoot_sound.play()
-                bullet_groupe.add(self.shoot(display, False))
-                self.shootCooldown = 50
-        else:
-            self.findPlayer = False
+        self.ennemi_frame += 1
+        if self.ennemi_frame >= len(self.animation_database[self.ennemi_action]):
+            self.ennemi_frame = 0
 
         if self.shootCooldown > 0:
             self.shootCooldown -= 1
