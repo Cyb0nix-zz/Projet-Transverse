@@ -435,6 +435,7 @@ def LevelEditor():
                 writer = csv.writer(txtfile, delimiter=',')
                 for row in world_data:
                     writer.writerow(row)
+            messagebox.showinfo("Sauvegarde","Le niveau a été sauvegardé avec succès !")
         if load_button.draw(display):
             scroll = 0
             try:
@@ -443,6 +444,7 @@ def LevelEditor():
                     for x, row in enumerate(reader):
                         for y, tile in enumerate(row):
                             world_data[x][y] = int(tile)
+                messagebox.showinfo("Chargement", "Le niveau a bien été chargé !")
             except FileNotFoundError:
                 pass
         if hide_button.draw(display):
