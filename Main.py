@@ -161,7 +161,7 @@ def Game(screen):
             if player_movement[1] < 0 and player_movement[0] > 0:
                 player_action, player_frame = animation.change_action(player_action, player_frame, 'jump')
 
-            player.move(player_movement, tile_rects,map,ennemi_groupe,end)
+            ennemi_groupe = player.move(player_movement, tile_rects,map,ennemi_groupe,end)
             if player.collision_types['bottom']:
                 player_y_momentum = 0
                 air_timer = 0

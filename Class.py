@@ -161,10 +161,15 @@ class Player(pygame.sprite.Sprite):
 
         if self.player_box.y > 900:
             sleep(0.5)
-            map.set_mobs(ennemis)
+            for ennemi in ennemis:
+                ennemi.kill()
+            print(ennemis)
             self.lives -= 1
             self.player_box.x = 450
             self.player_box.y = 600
+            return map.set_mobs(ennemis)
+        else:
+            return ennemis
 
     def update(self, player_img, display, scroll):
         display.blit(player_img, (self.player_box.x - scroll[0], self.player_box.y - scroll[1]))
