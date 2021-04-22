@@ -17,7 +17,9 @@ pygame.font.init()
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("The Shadow of the past")
 
-def Menu(screen,Initiale):
+
+
+def Menu(screen, Initiale):
     if not Initiale:
         screen = pygame.display.set_mode(WINDOW_SIZE)
         pygame.display.set_caption("The Shadow of the past")
@@ -44,7 +46,7 @@ def Menu(screen,Initiale):
     img_play = pygame.Surface((270, 60))
     img_play.fill((26, 126, 95))
     txt_play = button_font.render("Play", False, (243, 233, 210))
-    img_play.blit(txt_play,(90,10))
+    img_play.blit(txt_play, (90, 10))
     play_button = Button(500, 320, img_play, 1)
 
     img_editor = pygame.Surface((270, 60))
@@ -67,6 +69,7 @@ def Menu(screen,Initiale):
             play = False
         if editor:
             sleep(0.5)
+            menu_music.fadeout(300)
             LevelEditor()
             editor = False
 
@@ -79,8 +82,6 @@ def Menu(screen,Initiale):
         pygame.display.update()
         screen.blit(surf, (0, 0))
         clock.tick(FPS)
-
-
 
 
 def Game(screen):
@@ -129,7 +130,7 @@ def Game(screen):
             scroll[0] = int(scroll[0])
             scroll[1] = int(scroll[1])
 
-            tile_rects,end = map.update(scroll)
+            tile_rects, end = map.update(scroll)
 
             player_movement = [0, 0]
 
@@ -161,7 +162,7 @@ def Game(screen):
             if player_movement[1] < 0 and player_movement[0] > 0:
                 player_action, player_frame = animation.change_action(player_action, player_frame, 'jump')
 
-            ennemi_groupe = player.move(player_movement, tile_rects,map,ennemi_groupe,end)
+            ennemi_groupe = player.move(player_movement, tile_rects, map, ennemi_groupe, end)
             if player.collision_types['bottom']:
                 player_y_momentum = 0
                 air_timer = 0
@@ -248,8 +249,7 @@ def Game(screen):
             if menu:
                 menu = False
                 sleep(0.1)
-                Menu(screen,False)
-
+                Menu(screen, False)
 
             for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
                 if event.type == QUIT:  # Si un de ces événements est de type QUIT
@@ -283,8 +283,7 @@ def Game(screen):
             if menu:
                 menu = False
                 sleep(0.1)
-                Menu(screen,False)
-
+                Menu(screen, False)
 
             for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
                 if event.type == QUIT:  # Si un de ces événements est de type QUIT
@@ -317,7 +316,7 @@ def Game(screen):
 
             for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
                 if event.type == QUIT:  # Si un de ces événements est de type QUIT
-                    pygame.quit()# On arrête la boucle
+                    pygame.quit()  # On arrête la boucle
 
         surf = pygame.transform.scale(display, WINDOW_SIZE)
         pygame.display.update()
@@ -326,13 +325,10 @@ def Game(screen):
 
 
 def LevelEditor():
-
-
     # Taille de la fenêtre (avec taille marges)
     SIDE_MARGIN = 500
     SCREEN_WIDTH = 1280
     SCREEN_HEIGHT = 897
-
 
     # Variables
     ROWS = 29
@@ -349,6 +345,10 @@ def LevelEditor():
 
     display = pygame.display.set_mode((SCREEN_WIDTH + SIDE_MARGIN, SCREEN_HEIGHT))
     pygame.display.set_caption("The Shadow of the past Level Editor")
+
+    menu_music = pygame.mixer.Sound('Assets/Sounds/music.wav')
+    menu_music.play()
+    menu_music.set_volume(0.01)
 
     # Background
     bg_0 = pygame.image.load('Assets/bg/0.png').convert_alpha()
@@ -463,7 +463,7 @@ def LevelEditor():
                 writer = csv.writer(txtfile, delimiter=',')
                 for row in world_data:
                     writer.writerow(row)
-            messagebox.showinfo("Sauvegarde","Le niveau a été sauvegardé avec succès !")
+            messagebox.showinfo("Sauvegarde", "Le niveau a été sauvegardé avec succès !")
         if load_button.draw(display):
             scroll = 0
             try:
@@ -515,7 +515,8 @@ def LevelEditor():
                     scroll_speed = 5
                 if event.key == K_ESCAPE:
                     Run = False
-                    Menu(screen,False)
+                    menu_music.stop()
+                    Menu(screen, False)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     scroll_left = False
@@ -529,5 +530,4 @@ def LevelEditor():
             pass
 
 
-
-Menu(screen,True)
+Menu(screen, True)
