@@ -16,7 +16,7 @@ pygame.font.init()
 
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("The Shadow of the past")
-programIcon = pygame.image.load('Assets/Characters/Player/idle/idle_0.png')
+programIcon = pygame.image.load('Assets/Logo.png')
 pygame.display.set_icon(programIcon)
 
 
@@ -104,7 +104,7 @@ def Game(screen):
     player_frame = 0
     player_flip = False
 
-    player = Player("Cybonix", 20, 3, 3, 3, 75)
+    player = Player("Cybonix", 20, 3, 3, 3, 100)
     player.setLocation(450, 600)
 
     true_scroll = [0, 0]
