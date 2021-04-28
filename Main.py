@@ -16,6 +16,8 @@ pygame.font.init()
 
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("The Shadow of the past")
+programIcon = pygame.image.load('Assets/Characters/Player/idle/idle_0.png')
+pygame.display.set_icon(programIcon)
 
 
 
