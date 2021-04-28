@@ -21,6 +21,9 @@ pygame.display.set_icon(programIcon)
 
 
 
+
+
+
 def Menu(screen, Initiale):
     if not Initiale:
         screen = pygame.display.set_mode(WINDOW_SIZE)
