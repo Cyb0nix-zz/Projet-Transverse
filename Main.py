@@ -330,12 +330,12 @@ def Game(screen):
 
 
 def LevelEditor():
-    # Taille de la fenêtre (avec taille marges)
+    # Taille de la fenêtre + taille marges
     SIDE_MARGIN = 500
     SCREEN_WIDTH = 1280
     SCREEN_HEIGHT = 897
 
-    # Variables
+    # Définition des différentes Variables
     ROWS = 29
     MAX_COLS = 312
     TILE_SIZE = 32
@@ -348,9 +348,11 @@ def LevelEditor():
     current_tile = 0
     grid = 0
 
+    # Affichage de la fenêtre pygame
     display = pygame.display.set_mode((SCREEN_WIDTH + SIDE_MARGIN, SCREEN_HEIGHT))
     pygame.display.set_caption("The Shadow of the past Level Editor")
 
+    # Définition de la musique dans le leveleditor
     menu_music = pygame.mixer.Sound('Assets/Sounds/music.wav')
     menu_music.play()
     menu_music.set_volume(0.01)
@@ -359,22 +361,30 @@ def LevelEditor():
     bg_0 = pygame.image.load('Assets/bg/0.png').convert_alpha()
     bg = bg_0.convert_alpha()
 
-    # Créer les différentes tile
+    # Créer les différentes tiles
     img_list = []
+    # Chargement des différentes tiles
     for x in range(TILE_TYPES):
+        # Conditions qui permet aux cases qui permettent de placer les ennemis de ne pas etre déformé
         if x == 75 or x == 76:
             img = pygame.image.load(f'Assets/Tiles/{x}.png').convert_alpha()
             img_list.append(img)
         else:
+            # Si la tuile n'est ni la 75e ni la 76e elle est chargé puis converti a la bonne taille avant d'être chargé
             img = pygame.image.load(f'Assets/Tiles/{x}.png').convert_alpha()
             img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
             img_list.append(img)
 
-    # Boutton pour sauvegarder et charger les niveaux
+    # Chargement des images correspondant aux boutton dans le level editor
+    # Boutton pour sauvegarder
     save_btn = pygame.image.load('Assets/LevelEditor/save_btn.png').convert_alpha()
+    # Boutton pour charger
     load_btn = pygame.image.load('Assets/LevelEditor/load_btn.png').convert_alpha()
+    # Boutton pour afficher
     grid_btn = pygame.image.load('Assets/LevelEditor/grid_btn.png').convert_alpha()
+    # Boutton pour enlever la grille
     hide_btn = pygame.image.load('Assets/LevelEditor/hide_btn.png').convert_alpha()
+    # Boutton poubelle pour supprimer le niveau
     trash_btn = pygame.image.load('Assets/LevelEditor/trash.png').convert_alpha()
 
     # Couleurs
@@ -382,22 +392,27 @@ def LevelEditor():
     WHITE = (255, 255, 255)
     GREEN = (144, 201, 120)
 
+    # Définition d'une police
     font = pygame.font.SysFont('Futura', 30)
 
-    # Liste vide de Tiles
+    # Définition d'une liste vide afin d'accueillir par la suite les différentes tiles dans le monde
     world_data = []
     for row in range(ROWS):
         r = [-1] * MAX_COLS
         world_data.append(r)
 
+    # Définition d'une fonction permettant d'afficher du texte en fonction du contenu, de la police voulu, de la couleur voulu, ainsi que les coordonnées horizontales et verticales
     def draw_text(text, font, text_col, x, y):
         img = font.render(text, True, text_col)
         display.blit(img, (x, y))
 
-    # Dessiner background
+    # Définition d'une fonction permettant d'afficher le background voulu
     def draw_bg(bgd):
+        # Remplissage de l'arrière plan (derrière le background prédifini)
         display.fill(BLACK)
+        # Définition de la largeur du background
         width = bgd.get_width()
+        # Affichage du background
         for x in range(1):
             display.blit(bgd, ((x * width) - scroll, 0))
 
@@ -413,6 +428,7 @@ def LevelEditor():
         else:
             pass
 
+    # Fonction permettant de supprimer un niveau et d'afficher une fenêtre Tkinter nous indiquant que le niveau a bien été supprimé
     def del_function(level):
         try:
             msgbox = messagebox.askquestion('Delete level ', 'Voulez-vous vraiment supprimer le niveau ? ',
@@ -424,70 +440,96 @@ def LevelEditor():
         except FileNotFoundError:
             pass
 
-    # Dessiner les tiles dans le monde
+    # Fonction permettant d'afficher les différentes tiles dans le monde
     def draw_world():
         for y, row in enumerate(world_data):
             for x, tile in enumerate(row):
                 if tile >= 0:
                     display.blit(img_list[tile], (x * TILE_SIZE - scroll, y * TILE_SIZE))
 
-    # Boutons paramètres
+    # Listes des différentes tiles que l'on pourra sélectionner avant de les placer dans le monde
     button_list = []
+    # Variables déterminant le nombre de tiles qu'il y'aura par ligne
     button_col = 0
+    # Variables déterminant le nombre de ligne qu'il aura
     button_row = 0
 
     for i in range(len(img_list)):
         tile_button = Button(SCREEN_WIDTH + (50 * button_col) + 50, 50 * button_row + 50, img_list[i], 1)
+        # Ajout de chaque tiles a droite de la fenetre de jeu
         button_list.append(tile_button)
         button_col += 1
+        # A partir de 9 tiles a la suite, passez a la ligne suivante
         if button_col == 9:
             button_row += 1
             button_col = 0
 
+    # Initialisation de la fenêtre Tkinter et destruction instantanée afin de ne pas avoir une fenêtre vide durant toute notre expérience
     root = tk.Tk()
     root.withdraw()
     Run = True
     while Run:
+        # Mis en place d'un rafraichissement d'image a 60 image / tick
         clock.tick(FPS)
+        # Affichage de la valeur du taux de raffraichissement
         draw_text(f'{FPS}', font, WHITE, 1200, 870)
+        # Appel de la fonction afin de définir le background
         draw_bg(bg)
+        # Mise a jour du monde
         draw_world()
+        # Affichage de la grille
         draw_grid(grid)
+        # Affichage d'un rectangle vert qui accueillera toutes les tiles qu'on pourra placer
         pygame.draw.rect(display, GREEN, (SCREEN_WIDTH, 0, SIDE_MARGIN, SCREEN_HEIGHT))
+        # Chargement des différents boutons aux bons emplacements
         save_button = Button(SCREEN_WIDTH + 30, 845, save_btn, 1)
         load_button = Button(SCREEN_WIDTH + 120, 845, load_btn, 1)
         hide_button = Button(SCREEN_WIDTH + 210, 845, hide_btn, 1)
         grid_button = Button(SCREEN_WIDTH + 300, 845, grid_btn, 1)
         trash_button = Button(SCREEN_WIDTH + 430, 840, trash_btn, 1)
+        # Affichage du niveau et du taux de rafraichissement aux coordonnées souhaités
         draw_text(f'Level: {level} ', font, WHITE, 1190, 870)
         draw_text(f'FPS:{FPS} ', font, WHITE, 1190, 830)
+        # Condition reliant le bouton poubelle et la fonction qui supprime le niveau
         if trash_button.draw(display):
             del_function(level)
+
         if save_button.draw(display):
+            # Stockage du niveau dans un fichier txt
             with open(f'Levels/level{level}_data.txt', 'w', newline='') as txtfile:
                 writer = csv.writer(txtfile, delimiter=',')
                 for row in world_data:
                     writer.writerow(row)
+            # Affichage d'un message grâce a la fenetre Tkinter permettant de confirmer la sauvegarde
             messagebox.showinfo("Sauvegarde", "Le niveau a été sauvegardé avec succès !")
+
+        # Confition reliant le bouton load à la fonction chargement
         if load_button.draw(display):
+            # Remise a niveau de la caméra au début du niveau
             scroll = 0
             try:
+                # Chargement du niveau choisi s'il en existe un
                 with open(f'Levels/level{level}_data.txt', newline='') as txtfile:
                     reader = csv.reader(txtfile, delimiter=',')
                     for x, row in enumerate(reader):
                         for y, tile in enumerate(row):
                             world_data[x][y] = int(tile)
+                # Affichage d'un message grâce a la fenetre Tkinter permettant de confirmer la sauvegarde
                 messagebox.showinfo("Chargement", "Le niveau a bien été chargé !")
             except FileNotFoundError:
                 pass
+        # Permet d'enlever la grille
         if hide_button.draw(display):
             grid = 0
+        # Permet d'afficher la grille
         if grid_button.draw(display):
             grid = 1
         button_count = 0
+        # Affectation de la tile courante a celle que l'on a selectionné parmi ceux dans la liste
         for button_count, i in enumerate(button_list):
             if i.draw(display):
                 current_tile = button_count
+        # Mise en place d'un contour blanc autour de la tuile sélectionné
         rectangle = pygame.draw.rect(display, WHITE, button_list[current_tile].rect, 3)
         if scroll_left and scroll > 0:
             scroll -= 5 * scroll_speed
@@ -497,14 +539,18 @@ def LevelEditor():
         pos = pygame.mouse.get_pos()
         x = (pos[0] + scroll) // TILE_SIZE
         y = pos[1] // TILE_SIZE
+        # Affectation des différentes actions que peux réaliser les cliques souries
         if pos[0] < SCREEN_WIDTH and pos[1] < SCREEN_HEIGHT:
+            # Si clique gauche afficher la tuile
             if pygame.mouse.get_pressed()[0] == 1:
                 if world_data[y][x] != current_tile:
                     world_data[y][x] = current_tile
+            # Si clique droit supprimer la tuile la tuile
             if pygame.mouse.get_pressed()[2] == 1:
                 world_data[y][x] = -1
 
         for event in pygame.event.get():
+            # Même système pour affecter les différentes touches permettant de déplacer la caméra et d'augmenter la vitesse de défilement du background
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
@@ -530,6 +576,7 @@ def LevelEditor():
                 if event.key == pygame.K_LSHIFT:
                     scroll_speed = 1
         try:
+            # Permet de mettre a jour la fenetre
             pygame.display.update()
         except pygame.error:
             pass
