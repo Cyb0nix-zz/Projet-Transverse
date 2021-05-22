@@ -90,7 +90,7 @@ def Menu(screen, Initiale):
 
 
 def Game(screen):
-    display = pygame.Surface((1280, 704))
+    display = pygame.Surface((1280, 720))
 
     map = Map(1, display, TILE_SIZE)
 
@@ -297,7 +297,7 @@ def Game(screen):
                     if event.key == K_ESCAPE:
                         pause = False
         if player.win:
-            fond = pygame.image.load('Assets/Menu/bg_menu.png')
+            fond = pygame.image.load('Assets/Menu/bg_menu1.png')
             display.blit(fond, (-2, 0))
             title_font = pygame.font.Font('Assets/Menu/Wargate.ttf', 85)
             button_font = pygame.font.Font('Assets/Menu/Cold_Warm.otf', 40)
